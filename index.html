@@ -56,14 +56,14 @@
               <div>
                 <h3 class="text-lg font-semibold">Custom Alerts</h3>
                 <label class="block mb-2">
-                  <input type="checkbox" class="mr-2" checked /> Notify on Exit
+                  <input type="checkbox" class="mr-2" checked /> Notify on Exit (Text to +16479669317)
                 </label>
                 <label class="block mb-2">
                   <input type="checkbox" class="mr-2" /> Notify on Enter
                 </label>
                 <div>
                   <h3 class="text-lg font-semibold">Emergency Contacts</h3>
-                  <p>John Doe: +1-555-123-4567</p>
+                  <p>Emergency Contact: +16479669317</p>
                   <button class="bg-blue-500 text-white p-2 rounded mt-2">Add Contact</button>
                 </div>
               </div>
@@ -239,13 +239,14 @@
                 <div>
                   <p class="text-red-700 font-semibold">🚨 Exit Alert</p>
                   <p class="text-red-600">Child exited Gomti Nagar School Safe Zone at 3:15 PM</p>
-                  <p class="text-gray-600 text-sm">Location: Near Vinay Khand, Gomti Nagar</p>
+                  <p class="text-gray-600 text-sm">Text sent to +16479669317: Exit Alert: Child left Gomti Nagar School Safe Zone at 3:15 PM</p>
                 </div>
                 <button class="text-red-500 font-semibold" onClick={dismissExitAlert}>Dismiss</button>
               </div>
             )}
             <h3 class="text-lg font-semibold mb-2">Real-Time Alerts</h3>
-            <p class="text-red-600">🚨 Child exited School Safe Zone at 3:15 PM</p>
+            <p class="text-red-600">🚨 SOS: Emergency alert sent to +16479669317 at 3:34 PM, May 18, 2025</p>
+            <p class="text-red-600">🚨 Exit Alert: Child exited School Safe Zone at 3:15 PM, notified +16479669317</p>
             <p class="text-gray-600">Child entered Park Safe Zone at 2:30 PM</p>
             <h3 class="text-lg font-semibold mb-2 mt-4">Weekly Reports</h3>
             <p>Last report: Sent May 16, 2025</p>
@@ -279,8 +280,8 @@
             <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
                 <h3 class="text-lg font-bold text-red-600 mb-2">🚨 SOS Alert</h3>
-                <p class="text-gray-700">SOS Alert sent to emergency contacts at 03:34 PM, May 18, 2025!</p>
-                <p class="text-gray-600 text-sm mt-2">Contacts notified: John Doe (+1-555-123-4567)</p>
+                <p class="text-gray-700">Text sent to +16479669317: SOS: Emergency alert from Jio SafeNet at 03:34 PM, May 18, 2025</p>
+                <p class="text-gray-600 text-sm mt-2">Contact notified: Emergency Contact (+16479669317)</p>
                 <button
                   class="bg-blue-500 text-white p-2 rounded w-full mt-4"
                   onClick={closeSosModal}
