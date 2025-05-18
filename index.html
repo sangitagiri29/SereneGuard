@@ -18,27 +18,26 @@
     function App() {
       const [currentPage, setCurrentPage] = React.useState('dashboard');
       const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+      const [showExitAlert, setShowExitAlert] = React.useState(true); // State for mock exit alert
 
       const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+      const dismissExitAlert = () => setShowExitAlert(false); // Dismiss alert
 
-      // Geofencing Page with Map of Gomti Nagar, Lucknow
+      // Geofencing Page
       const GeofencingPage = () => {
         React.useEffect(() => {
-          // Initialize Leaflet map centered on Gomti Nagar, Lucknow
-          const map = L.map('map').setView([26.8489, 80.9470], 14); // Gomti Nagar coordinates, zoom level 14
+          const map = L.map('map').setView([26.8489, 80.9470], 14);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           }).addTo(map);
-          // Add a sample safe zone circle (e.g., around a school in Gomti Nagar)
           L.circle([26.8489, 80.9470], {
             color: 'blue',
             fillColor: '#30f',
             fillOpacity: 0.2,
-            radius: 500 // 500 meters
+            radius: 500
           }).addTo(map).bindPopup('Gomti Nagar School Safe Zone');
-          // Add a marker for reference
           L.marker([26.8489, 80.9470]).addTo(map).bindPopup('Gomti Nagar Center').openPopup();
-        }, []); // Run once on mount
+        }, []);
 
         return (
           <div class="p-4">
@@ -54,7 +53,7 @@
               <div>
                 <h3 class="text-lg font-semibold">Custom Alerts</h3>
                 <label class="block mb-2">
-                  <input type="checkbox" class="mr-2" /> Notify on Exit
+                  <input type="checkbox" class="mr-2" checked /> Notify on Exit
                 </label>
                 <label class="block mb-2">
                   <input type="checkbox" class="mr-2" /> Notify on Enter
@@ -73,6 +72,7 @@
         );
       };
 
+      // Dashboard
       const Dashboard = () => (
         <div class="p-4">
           <h2 class="text-2xl font-bold mb-4">Safety Status</h2>
@@ -102,6 +102,7 @@
         </div>
       );
 
+      // Safe Browsing Page
       const SafeBrowsingPage = () => (
         <div class="p-4">
           <h2 class="text-2xl font-bold mb-4">Safe Browsing Control</h2>
@@ -125,6 +126,7 @@
         </div>
       );
 
+      // Screen Time Page
       const ScreenTimePage = () => (
         <div class="p-4">
           <h2 class="text-2xl font-bold mb-4">Screen Time Settings</h2>
@@ -144,13 +146,24 @@
         </div>
       );
 
+      // Notifications Page with Mock Exit Alert
       const NotificationsPage = () => (
         <div class="p-4">
           <h2 class="text-2xl font-bold mb-4">Notifications & Reports</h2>
           <div class="bg-white p-4 rounded-lg shadow mb-4">
+            {showExitAlert && (
+              <div class="bg-red-100 border-l-4 border-red-500 p-4 mb-4 rounded flex justify-between items-center">
+                <div>
+                  <p class="text-red-700 font-semibold">🚨 Exit Alert</p>
+                  <p class="text-red-600">Child exited Gomti Nagar School Safe Zone at 3:15 PM</p>
+                  <p class="text-gray-600 text-sm">Location: Near Vinay Khand, Gomti Nagar</p>
+                </div>
+                <button class="text-red-500 font-semibold" onClick={dismissExitAlert}>Dismiss</button>
+              </div>
+            )}
             <h3 class="text-lg font-semibold mb-2">Real-Time Alerts</h3>
-            <p>🚨 Unsafe site accessed at 1:45 PM</p>
-            <p>📍 Child exited safe zone at 3:15 PM</p>
+            <p class="text-red-600">🚨 Child exited School Safe Zone at 3:15 PM</p>
+            <p class="text-gray-600">Child entered Park Safe Zone at 2:30 PM</p>
             <h3 class="text-lg font-semibold mb-2 mt-4">Weekly Reports</h3>
             <p>Last report: Sent May 16, 2025</p>
             <button class="bg-blue-500 text-white p-2 rounded w-full mt-2">View Latest Report</button>
