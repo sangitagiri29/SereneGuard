@@ -8,6 +8,9 @@
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/babel-standalone@6.26.0/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet CSS and JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body class="bg-gray-100 font-sans">
   <div id="root"></div>
@@ -17,6 +20,58 @@
       const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
       const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+      // Geofencing Page with Map of Gomti Nagar, Lucknow
+      const GeofencingPage = () => {
+        React.useEffect(() => {
+          // Initialize Leaflet map centered on Gomti Nagar, Lucknow
+          const map = L.map('map').setView([26.8489, 80.9470], 14); // Gomti Nagar coordinates, zoom level 14
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          }).addTo(map);
+          // Add a sample safe zone circle (e.g., around a school in Gomti Nagar)
+          L.circle([26.8489, 80.9470], {
+            color: 'blue',
+            fillColor: '#30f',
+            fillOpacity: 0.2,
+            radius: 500 // 500 meters
+          }).addTo(map).bindPopup('Gomti Nagar School Safe Zone');
+          // Add a marker for reference
+          L.marker([26.8489, 80.9470]).addTo(map).bindPopup('Gomti Nagar Center').openPopup();
+        }, []); // Run once on mount
+
+        return (
+          <div class="p-4">
+            <h2 class="text-2xl font-bold mb-4">Geofencing Management</h2>
+            <div class="bg-white p-4 rounded-lg shadow mb-4">
+              <div id="map" class="w-full h-48 rounded mb-4"></div>
+              <button class="bg-green-500 text-white p-2 rounded w-full mb-2">Add Safe Zone</button>
+              <div class="mb-4">
+                <h3 class="text-lg font-semibold">Safe Zones</h3>
+                <p>Home: 123 Vibhuti Khand, Gomti Nagar</p>
+                <p>School: 456 Vinay Khand, Gomti Nagar</p>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold">Custom Alerts</h3>
+                <label class="block mb-2">
+                  <input type="checkbox" class="mr-2" /> Notify on Exit
+                </label>
+                <label class="block mb-2">
+                  <input type="checkbox" class="mr-2" /> Notify on Enter
+                </label>
+                <div>
+                  <h3 class="text-lg font-semibold">Emergency Contacts</h3>
+                  <p>John Doe: +1-555-123-4567</p>
+                  <button class="bg-blue-500 text-white p-2 rounded mt-2">Add Contact</button>
+                </div>
+              </div>
+            </div>
+            <button class="bg-gray-500 text-white p-2 rounded w-full" onClick={() => setCurrentPage('dashboard')}>
+              Back to Dashboard
+            </button>
+          </div>
+        );
+      };
 
       const Dashboard = () => (
         <div class="p-4">
@@ -44,38 +99,6 @@
             <p class="text-red-600">🚨 Child exited School Safe Zone at 3:15 PM</p>
             <p class="text-gray-600">Child entered Park Safe Zone at 2:30 PM</p>
           </div>
-        </div>
-      );
-
-      const GeofencingPage = () => (
-        <div class="p-4">
-          <h2 class="text-2xl font-bold mb-4">Geofencing Management</h2>
-          <div class="bg-white p-4 rounded-lg shadow mb-4">
-            <img src="https://via.placeholder.com/300x200?text=Map+View" alt="Map Placeholder" class="w-full h-48 object-cover rounded mb-4" />
-            <button class="bg-green-500 text-white p-2 rounded w-full mb-2">Add Safe Zone</button>
-            <div class="mb-4">
-              <h3 class="text-lg font-semibold">Safe Zones</h3>
-              <p>Home: 123 Main St</p>
-              <p>School: 456 Oak Ave</p>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold">Custom Alerts</h3>
-              <label class="block mb-2">
-                <input type="checkbox" class="mr-2" /> Notify on Exit
-              </label>
-              <label class="block mb-2">
-                <input type="checkbox" class="mr-2" /> Notify on Enter
-              </label>
-              <div>
-                <h3 class="text-lg font-semibold">Emergency Contacts</h3>
-                <p>John Doe: +1-555-123-4567</p>
-                <button class="bg-blue-500 text-white p-2 rounded mt-2">Add Contact</button>
-              </div>
-            </div>
-          </div>
-          <button class="bg-gray-500 text-white p-2 rounded w-full" onClick={() => setCurrentPage('dashboard')}>
-            Back to Dashboard
-          </button>
         </div>
       );
 
