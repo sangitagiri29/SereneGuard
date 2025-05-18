@@ -18,10 +18,10 @@
     function App() {
       const [currentPage, setCurrentPage] = React.useState('dashboard');
       const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-      const [showExitAlert, setShowExitAlert] = React.useState(true); // State for mock exit alert
+      const [showExitAlert, setShowExitAlert] = React.useState(true);
 
       const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-      const dismissExitAlert = () => setShowExitAlert(false); // Dismiss alert
+      const dismissExitAlert = () => setShowExitAlert(false);
 
       // Geofencing Page
       const GeofencingPage = () => {
@@ -126,27 +126,42 @@
         </div>
       );
 
-      // Screen Time Page
-      const ScreenTimePage = () => (
-        <div class="p-4">
-          <h2 class="text-2xl font-bold mb-4">Screen Time Settings</h2>
-          <div class="bg-white p-4 rounded-lg shadow mb-4">
-            <h3 class="text-lg font-semibold mb-2">Daily Limit</h3>
-            <input type="range" min="0" max="8" defaultValue="4" class="w-full mb-4" />
-            <p>Current Limit: 4 hours/day</p>
-            <h3 class="text-lg font-semibold mb-2">Usage Insights</h3>
-            <p>Today: 2h 15m</p>
-            <p>Yesterday: 3h 10m</p>
-            <h3 class="text-lg font-semibold mb-2">Smart Recommendations</h3>
-            <p>Reduce gaming apps by 30 min for balanced usage.</p>
-          </div>
-          <button class="bg-gray-500 text-white p-2 rounded w-full" onClick={() => setCurrentPage('dashboard')}>
-            Back to Dashboard
-          </button>
-        </div>
-      );
+      // Screen Time Page with Dynamic Slider
+      const ScreenTimePage = () => {
+        const [screenTimeLimit, setScreenTimeLimit] = React.useState(4); // Default to 4 hours
 
-      // Notifications Page with Mock Exit Alert
+        const handleSliderChange = (event) => {
+          setScreenTimeLimit(event.target.value);
+        };
+
+        return (
+          <div class="p-4">
+            <h2 class="text-2xl font-bold mb-4">Screen Time Settings</h2>
+            <div class="bg-white p-4 rounded-lg shadow mb-4">
+              <h3 class="text-lg font-semibold mb-2">Daily Limit</h3>
+              <input
+                type="range"
+                min="0"
+                max="8"
+                value={screenTimeLimit}
+                onChange={handleSliderChange}
+                class="w-full mb-4"
+              />
+              <p>Current Limit: {screenTimeLimit} hours/day</p>
+              <h3 class="text-lg font-semibold mb-2">Usage Insights</h3>
+              <p>Today: 2h 15m</p>
+              <p>Yesterday: 3h 10m</p>
+              <h3 class="text-lg font-semibold mb-2">Smart Recommendations</h3>
+              <p>Reduce gaming apps by 30 min for balanced usage.</p>
+            </div>
+            <button class="bg-gray-500 text-white p-2 rounded w-full" onClick={() => setCurrentPage('dashboard')}>
+              Back to Dashboard
+            </button>
+          </div>
+        );
+      };
+
+      // Notifications Page
       const NotificationsPage = () => (
         <div class="p-4">
           <h2 class="text-2xl font-bold mb-4">Notifications & Reports</h2>
