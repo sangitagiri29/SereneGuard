@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jio SafeNet - Parental Portal</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/babel-standalone@6.26.0/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div id="root"></div>
+  <script type="text/babel">
+    function App() {
+      const [currentPage, setCurrentPage] = React.useState('dashboard');
+      const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+
+      const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+      const Dashboard = () => (
+        <div class="p-4">
+          <h2 class="text-2xl font-bold mb-4">Safety Status</h2>
+          <div class="bg-white p-4 rounded-lg shadow mb-4">
+            <p class="text-green-600 font-semibold">Status: Active</p>
+            <p class="text-gray-600">All devices are within safe zones.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <button class="bg-blue-500 text-white p-2 rounded" onClick={() => setCurrentPage('geofencing')}>
+              Geofencing Settings
+            </button>
+            <button class="bg-blue-500 text-white p-2 rounded" onClick={() => setCurrentPage('browsing')}>
+              Safe Browsing
+            </button>
+            <button class="bg-blue-500 text-white p-2 rounded" onClick={() => setCurrentPage('screenTime')}>
+              Screen Time
+            </button>
+            <button class="bg-blue-500 text-white p-2 rounded" onClick={() => setCurrentPage('notifications')}>
+              View Alerts
+            </button>
+          </div>
+          <div class="bg-white p-4 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Recent Alerts</h3>
+            <p class="text-red-600">🚨 Child exited School Safe Zone at 3:15 PM</p>
+            <p class="text-gray-600">Child entered Park Safe Zone at 2:30 PM</p>
+          </div>
+        </div>
+      );
+
+      const GeofencingPage = () => (
+        <div class="p-4">
+          <h2 class="text-2xl font-bold mb-4">Geofencing Management</h2>
+          <div class="bg-white p-4 rounded-lg shadow mb-4">
+            <img src="https://via.placeholder.com/300x200?text=Map+View" alt="Map Placeholder" class="w-full h-48 object-cover rounded mb-4" />
+            <button class="bg-green-500 text-white p-2 rounded w-full mb-2">Add Safe Zone</button>
+            <div class="mb-4">
+              <h3 class="text-lg font-semibold">Safe Zones</h3>
+              <p>Home: 123 Main St</p>
+              <p>School: 456 Oak Ave</p>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold">Custom Alerts</h3>
+              <label class="block mb-2">
+                <input type="checkbox" class="mr-2" /> Notify on Exit
+              </label>
+              <label class="block mb-2">
+                <input type="checkbox" class="mr-2" /> Notify on Enter
+              </label>
+              <div>
+                <h3 class="text-lg font-semibold">Emergency Contacts</h3>
+                <p>John Doe: +1-555-123-4567</p>
+                <button class="bg-blue-500 text-white p-2 rounded mt-2">Add Contact</button>
+              </div>
+            </div>
+          </div>
+          <button class="bg-gray-500 text-white p-2 rounded w-full" onClick={() => setCurrentPage('dashboard')}>
+            Back to Dashboard
+          </button>
+        </div>
+      );
+
+      const SafeBrowsingPage = () => (
+        <div class="p-4">
+          <h2 class="text-2xl font-bold mb-4">Safe Browsing Control</h2>
+          <div class="bg-white p-4 rounded-lg shadow mb-4">
+            <h3 class="text-lg font-semibold mb-2">Age-Based Filtering</h3>
+            <select class="w-full p-2 border rounded mb-4">
+              <option>Under 10</option>
+              <option>10-13</option>
+              <option>14-17</option>
+            </select>
+            <h3 class="text-lg font-semibold mb-2">Manual Site Blocking</h3>
+            <input type="text" placeholder="Enter URL to block" class="w-full p-2 border rounded mb-2" />
+            <button class="bg-red-500 text-white p-2 rounded w-full mb-4">Block Site</button>
+            <h3 class="text-lg font-semibold mb-2">Browsing History</h3>
+            <p>example.com - 10:15 AM</p>
+            <p>safe-site.org - 9:30 AM</p>
+          </div>
+          <button class="bg-gray-500 text-white p-2 rounded w-full" onClick={() => setCurrentPage('dashboard')}>
+            Back to Dashboard
+          </button>
+        </div>
+      );
+
+      const ScreenTimePage = () => (
+        <div class="p-4">
+          <h2 class="text-2xl font-bold mb-4">Screen Time Settings</h2>
+          <div class="bg-white p-4 rounded-lg shadow mb-4">
+            <h3 class="text-lg font-semibold mb-2">Daily Limit</h3>
+            <input type="range" min="0" max="8" defaultValue="4" class="w-full mb-4" />
+            <p>Current Limit: 4 hours/day</p>
+            <h3 class="text-lg font-semibold mb-2">Usage Insights</h3>
+            <p>Today: 2h 15m</p>
+            <p>Yesterday: 3h 10m</p>
+            <h3 class="text-lg font-semibold mb-2">Smart Recommendations</h3>
+            <p>Reduce gaming apps by 30 min for balanced usage.</p>
+          </div>
+          <button class="bg-gray-500 text-white p-2 rounded w-full" onClick={() => setCurrentPage('dashboard')}>
+            Back to Dashboard
+          </button>
+        </div>
+      );
+
+      const NotificationsPage = () => (
+        <div class="p-4">
+          <h2 class="text-2xl font-bold mb-4">Notifications & Reports</h2>
+          <div class="bg-white p-4 rounded-lg shadow mb-4">
+            <h3 class="text-lg font-semibold mb-2">Real-Time Alerts</h3>
+            <p>🚨 Unsafe site accessed at 1:45 PM</p>
+            <p>📍 Child exited safe zone at 3:15 PM</p>
+            <h3 class="text-lg font-semibold mb-2 mt-4">Weekly Reports</h3>
+            <p>Last report: Sent May 16, 2025</p>
+            <button class="bg-blue-500 text-white p-2 rounded w-full mt-2">View Latest Report</button>
+          </div>
+          <button class="bg-gray-500 text-white p-2 rounded w-full" onClick={() => setCurrentPage('dashboard')}>
+            Back to Dashboard
+          </button>
+        </div>
+      );
+
+      return (
+        <div class="min-h-screen bg-gray-100">
+          {/* Header */}
+          <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold">Jio SafeNet</h1>
+            <div class="flex items-center space-x-4">
+              <span>Parent Account</span>
+              <button onClick={toggleSidebar}>⚙️</button>
+            </div>
+          </header>
+
+          {/* Sidebar */}
+          <div class={`fixed inset-y-0 left-0 w-64 bg-white shadow-lg transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 md:relative md:translate-x-0`}>
+            <div class="p-4">
+              <h2 class="text-lg font-semibold mb-4">Menu</h2>
+              <nav class="space-y-2">
+                <button class="w-full text-left p-2 hover:bg-blue-100 rounded" onClick={() => { setCurrentPage('geofencing'); setIsSidebarOpen(false); }}>
+                  📍 Geofencing
+                </button>
+                <button class="w-full text-left p-2 hover:bg-blue-100 rounded" onClick={() => { setCurrentPage('browsing'); setIsSidebarOpen(false); }}>
+                  🔍 Safe Browsing
+                </button>
+                <button class="w-full text-left p-2 hover:bg-blue-100 rounded" onClick={() => { setCurrentPage('screenTime'); setIsSidebarOpen(false); }}>
+                  ⏳ Screen Time
+                </button>
+                <button class="w-full text-left p-2 hover:bg-blue-100 rounded" onClick={() => { setCurrentPage('notifications'); setIsSidebarOpen(false); }}>
+                  ⚡ Notifications
+                </button>
+              </nav>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <main class="md:ml-64">
+            {currentPage === 'dashboard' && <Dashboard />}
+            {currentPage === 'geofencing' && <GeofencingPage />}
+            {currentPage === 'browsing' && <SafeBrowsingPage />}
+            {currentPage === 'screenTime' && <ScreenTimePage />}
+            {currentPage === 'notifications' && <NotificationsPage />}
+          </main>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
