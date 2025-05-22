@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jio-Inspired Digital Safety Apps Comparison</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/babel-standalone@6.26.0/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: #1e3a8a;
+      color: white;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 10;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    .checkmark { color: #16a34a; font-size: 1.5rem; }
+    .xmark { color: #ef4444; font-size: 1.5rem; }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-blue-50 to-white">
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const App = () => {
+      const [data, setData] = useState([
+        {
+          product: "Jio SafeNet & Geofencing",
+          icon: "https://www.jio.com/favicon.ico",
+          digitalSafety: "Yes",
+          parentalControls: "Yes",
+          psychologicalSafety: "Yes",
+          geofencing: "Yes",
+          sosEmergency: "Yes*",
+          platforms: "Jio SIM, JioFiber, JioCloud",
+          differentiator: "Telecom-integrated; seamless experience; combines safe browsing, screen time, real-time geofencing, and emergency alerts in one platform; leverages Jio’s massive reach and brand trust.",
+          color: "text-blue-700"
+        },
+        {
+          product: "Aura",
+          icon: "https://www.aura.com/favicon.ico",
+          digitalSafety: "Yes",
+          parentalControls: "Yes",
+          psychologicalSafety: "Yes",
+          geofencing: "No",
+          sosEmergency: "No",
+          platforms: "iOS, Android, PC, Mac",
+          differentiator: "All-in-one digital safety with expert-backed parental controls.",
+          color: "text-red-600"
+        },
+        {
+          product: "ESET Safer Kids Online",
+          icon: "https://www.eset.com/fileadmin/ESET/Global/Favicons/favicon.ico",
+          digitalSafety: "Yes",
+          parentalControls: "Guidance",
+          psychologicalSafety: "Yes",
+          geofencing: "No",
+          sosEmergency: "No",
+          platforms: "Web",
+          differentiator: "Education-focused, psychologist-developed content.",
+          color: "text-blue-500"
+        },
+        {
+          product: "Net Nanny",
+          icon: "https://www.netnanny.com/favicon.ico",
+          digitalSafety: "Yes",
+          parentalControls: "Yes",
+          psychologicalSafety: "No",
+          geofencing: "Yes",
+          sosEmergency: "No",
+          platforms: "iOS, Android",
+          differentiator: "Intuitive UI, strong filtering.",
+          color: "text-red-500"
+        },
+        {
+          product: "Kaspersky Safe Kids",
+          icon: "https://www.kaspersky.com/favicon.ico",
+          digitalSafety: "Yes",
+          parentalControls: "Yes",
+          psychologicalSafety: "No",
+          geofencing: "Yes",
+          sosEmergency: "No",
+          platforms: "iOS, Android, PC",
+          differentiator: "Value, broad platform support.",
+          color: "text-blue-600"
+        },
+        {
+          product: "Qustodio",
+          icon: "https://www.qustodio.com/favicon.ico",
+          digitalSafety: "Yes",
+          parentalControls: "Yes",
+          psychologicalSafety: "No",
+          geofencing: "Yes",
+          sosEmergency: "No",
+          platforms: "iOS, Android, PC",
+          differentiator: "Text/call monitoring.",
+          color: "text-red-700"
+        },
+        {
+          product: "Norton Family",
+          icon: "https://www.norton.com/favicon.ico",
+          digitalSafety: "Yes",
+          parentalControls: "Yes",
+          psychologicalSafety: "No",
+          geofencing: "Yes",
+          sosEmergency: "No",
+          platforms: "iOS, Android, Win",
+          differentiator: "Unlimited devices.",
+          color: "text-blue-800"
+        },
+        {
+          product: "OurPact",
+          icon: "https://via.placeholder.com/40?text=OurPact",
+          digitalSafety: "Yes",
+          parentalControls: "Yes",
+          psychologicalSafety: "No",
+          geofencing: "Yes",
+          sosEmergency: "No",
+          platforms: "iOS, Android",
+          differentiator: "Best for iOS.",
+          color: "text-red-400"
+        },
+        {
+          product: "Google Family Link",
+          icon: "https://www.google.com/favicon.ico",
+          digitalSafety: "Yes",
+          parentalControls: "Yes",
+          psychologicalSafety: "No",
+          geofencing: "Yes",
+          sosEmergency: "No",
+          platforms: "Android",
+          differentiator: "Free, Android only.",
+          color: "text-blue-400"
+        },
+        {
+          product: "WhereSafe",
+          icon: "https://via.placeholder.com/40?text=WhereSafe",
+          digitalSafety: "No",
+          parentalControls: "No",
+          psychologicalSafety: "No",
+          geofencing: "Yes",
+          sosEmergency: "Yes**",
+          platforms: "GPS + Mobile App",
+          differentiator: "Asset tracking, SOS for elderly/kids.",
+          color: "text-red-800"
+        },
+        {
+          product: "Wysa (Mental Health App)",
+          icon: "https://www.wysa.io/favicon.ico",
+          digitalSafety: "No",
+          parentalControls: "No",
+          psychologicalSafety: "Yes",
+          geofencing: "No",
+          sosEmergency: "No",
+          platforms: "iOS, Android",
+          differentiator: "AI chatbot, self-care.",
+          color: "text-blue-300"
+        },
+        {
+          product: "SOS Children’s Villages",
+          icon: "https://www.sos-childrensvillages.org/favicon.ico",
+          digitalSafety: "No",
+          parentalControls: "No",
+          psychologicalSafety: "Yes",
+          geofencing: "No",
+          sosEmergency: "No",
+          platforms: "Program-based",
+          differentiator: "Family strengthening, holistic support.",
+          color: "text-red-300"
+        }
+      ]);
+
+      const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+      const [filterPlatform, setFilterPlatform] = useState('');
+      const [expandedRow, setExpandedRow] = useState(null);
+
+      const sortData = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+          direction = 'desc';
+        }
+        const sortedData = [...data].sort((a, b) => {
+          if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
+          if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
+          return 0;
+        });
+        setData(sortedData);
+        setSortConfig({ key, direction });
+      };
+
+      const filteredData = filterPlatform
+        ? data.filter(item => item.platforms.toLowerCase().includes(filterPlatform.toLowerCase()))
+        : data;
+
+      const toggleRow = (index) => {
+        setExpandedRow(expandedRow === index ? null : index);
+      };
+
+      const renderIndicator = (value) => {
+        if (value === "Yes") return <span className="checkmark">✅</span>;
+        if (value === "No") return <span className="xmark">❌</span>;
+        return value;
+      };
+
+      return (
+        <div className="container mx-auto p-6">
+          <h1 className="text-4xl font-bold text-center mb-8 text-blue-900">Jio-Inspired Safety Apps Comparison</h1>
+          <div className="mb-6 flex flex-col sm:flex-row gap-4">
+            <input
+              type="text"
+              placeholder="Filter by platform (e.g., iOS, Android)"
+              className="w-full sm:w-1/2 p-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm"
+              onChange={(e) => setFilterPlatform(e.target.value)}
+            />
+            <button
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+              onClick={() => setFilterPlatform('')}
+            >
+              Clear Filter
+            </button>
+          </div>
+          <div className="overflow-x-auto shadow-xl rounded-lg">
+            <table className="min-w-full bg-white">
+              <thead className="bg-blue-900 text-white">
+                <tr>
+                  <th className="p-4 text-left w-12 sm:hidden">Toggle</th>
+                  <th className="p-4 text-left">Icon</th>
+                  {[
+                    { key: 'product', label: 'Product/App' },
+                    { key: 'digitalSafety', label: 'Digital Safety' },
+                    { key: 'parentalControls', label: 'Parental Controls' },
+                    { key: 'psychologicalSafety', label: 'Psychological Safety' },
+                    { key: 'geofencing', label: 'Geofencing' },
+                    { key: 'sosEmergency', label: 'SOS/Emergency' },
+                    { key: 'platforms', label: 'Platform(s)' },
+                    { key: 'differentiator', label: 'Unique Differentiator' }
+                  ].map(({ key, label }) => (
+                    <th
+                      key={key}
+                      className="p-4 text-left cursor-pointer hover:bg-blue-800"
+                      onClick={() => sortData(key)}
+                    >
+                      {label} {sortConfig.key === key && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filteredData.map((item, index) => (
+                  <>
+                    <tr key={index} className="border-b hover:bg-blue-50 transition">
+                      <td className="p-4 sm:hidden">
+                        <button onClick={() => toggleRow(index)} className="text-blue-600">
+                          {expandedRow === index ? '−' : '+'}
+                        </button>
+                      </td>
+                      <td className="p-4">
+                        <img src={item.icon} alt={`${item.product} icon`} className="w-10 h-10 rounded-full border border-blue-200" />
+                      </td>
+                      <td className={`p-4 font-semibold ${item.color}`}>{item.product}</td>
+                      <td className="p-4 hidden sm:table-cell">{renderIndicator(item.digitalSafety)}</td>
+                      <td className="p-4 hidden sm:table-cell">{renderIndicator(item.parentalControls)}</td>
+                      <td className="p-4 hidden sm:table-cell">{renderIndicator(item.psychologicalSafety)}</td>
+                      <td className="p-4 hidden sm:table-cell">{renderIndicator(item.geofencing)}</td>
+                      <td className="p-4 hidden sm:table-cell">{renderIndicator(item.sosEmergency)}</td>
+                      <td className="p-4 hidden sm:table-cell">{item.platforms}</td>
+                      <td className="p-4 hidden sm:table-cell bg-blue-100 italic tooltip">
+                        {item.differentiator.substring(0, 50) + (item.differentiator.length > 50 ? '...' : '')}
+                        <span className="tooltip-text">{item.differentiator}</span>
+                      </td>
+                    </tr>
+                    {expandedRow === index && (
+                      <tr className="sm:hidden bg-blue-50">
+                        <td colSpan="9" className="p-4">
+                          <div className="grid grid-cols-1 gap-2">
+                            <p><strong>Digital Safety:</strong> {renderIndicator(item.digitalSafety)}</p>
+                            <p><strong>Parental Controls:</strong> {renderIndicator(item.parentalControls)}</p>
+                            <p><strong>Psychological Safety:</strong> {renderIndicator(item.psychologicalSafety)}</p>
+                            <p><strong>Geofencing:</strong> {renderIndicator(item.geofencing)}</p>
+                            <p><strong>SOS/Emergency:</strong> {renderIndicator(item.sosEmergency)}</p>
+                            <p><strong>Platforms:</strong> {item.platforms}</p>
+                            <p><strong>Differentiator:</strong> {item.differentiator}</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
