@@ -11,8 +11,24 @@
   <!-- Leaflet CSS and JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gradient-to-br from-blue-50 to-gray-100 font-sans">
   <div id="root"></div>
   <script type="text/babel">
     function App() {
@@ -28,7 +44,7 @@
       const closeSosModal = () => setShowSosModal(false);
       const triggerToast = () => {
         setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000); // Hide toast after 3 seconds
+        setTimeout(() => setShowToast(false), 3000);
       };
 
       // Geofencing Page
@@ -55,39 +71,39 @@
         };
 
         return (
-          <div class="p-4">
-            <h2 class="text-2xl font-bold mb-4">Geofencing Management</h2>
+          <div className="p-6">
+            <h2 className="text-3xl font-bold mb-6 text-gray-800">Geofencing Management</h2>
             {saveMessage && (
-              <p class="text-green-600 font-semibold mb-4">{saveMessage}</p>
+              <p className="text-green-600 font-semibold mb-4">{saveMessage}</p>
             )}
-            <div class="bg-white p-4 rounded-lg shadow mb-4">
-              <div id="map" class="w-full h-48 rounded mb-4"></div>
-              <button class="bg-green-500 text-white p-2 rounded w-full mb-2">Add Safe Zone</button>
-              <div class="mb-4">
-                <h3 class="text-lg font-semibold">Safe Zones</h3>
-                <p>Home: 123 Vibhuti Khand, Gomti Nagar</p>
-                <p>School: 456 Vinay Khand, Gomti Nagar</p>
+            <div className="bg-white p-6 rounded-xl shadow-lg mb-6">
+              <div id="map" className="w-full h-64 rounded-lg mb-4"></div>
+              <button className="bg-green-500 text-white p-3 rounded-lg w-full mb-4 hover:bg-green-600 transition">Add Safe Zone</button>
+              <div className="mb-4">
+                <h3 className="text-xl font-semibold text-gray-700">Safe Zones</h3>
+                <p className="text-gray-600">Home: 123 Vibhuti Khand, Gomti Nagar</p>
+                <p className="text-gray-600">School: 456 Vinay Khand, Gomti Nagar</p>
               </div>
               <div>
-                <h3 class="text-lg font-semibold">Custom Alerts</h3>
-                <label class="block mb-2">
-                  <input type="checkbox" class="mr-2" checked /> Notify on Exit (Text to +16479669317)
+                <h3 className="text-xl font-semibold text-gray-700">Custom Alerts</h3>
+                <label className="block mb-2">
+                  <input type="checkbox" className="mr-2" checked /> Notify on Exit (Text to +16479669317)
                 </label>
-                <label class="block mb-2">
-                  <input type="checkbox" class="mr-2" /> Notify on Enter
+                <label className="block mb-2">
+                  <input type="checkbox" className="mr-2" /> Notify on Enter
                 </label>
                 <div>
-                  <h3 class="text-lg font-semibold">Emergency Contacts</h3>
-                  <p>Emergency Contact: +16479669317</p>
-                  <button class="bg-blue-500 text-white p-2 rounded mt-2">Add Contact</button>
+                  <h3 className="text-xl font-semibold text-gray-700">Emergency Contacts</h3>
+                  <p className="text-gray-600">Emergency Contact: +16479669317</p>
+                  <button className="bg-blue-500 text-white p-3 rounded-lg mt-2 hover:bg-blue-600 transition">Add Contact</button>
                 </div>
               </div>
             </div>
-            <div class="flex space-x-4">
-              <button class="bg-gray-500 text-white p-2 rounded w-full" onClick={() => setCurrentPage('dashboard')}>
+            <div className="flex space-x-4">
+              <button className="bg-gray-500 text-white p-3 rounded-lg w-full hover:bg-gray-600 transition" onClick={() => setCurrentPage('dashboard')}>
                 Back to Dashboard
               </button>
-              <button class="bg-blue-500 text-white p-2 rounded w-full" onClick={handleSave}>
+              <button className="bg-blue-500 text-white p-3 rounded-lg w-full hover:bg-blue-600 transition" onClick={handleSave}>
                 Save
               </button>
             </div>
@@ -97,31 +113,63 @@
 
       // Dashboard
       const Dashboard = () => (
-        <div class="p-4">
-          <h2 class="text-2xl font-bold mb-4">Safety Status</h2>
-          <div class="bg-white p-4 rounded-lg shadow mb-4">
-            <p class="text-green-600 font-semibold">Status: Active</p>
-            <p class="text-gray-600">All devices are within safe zones.</p>
+        <div className="p-6 max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold mb-6 text-gray-800 animate-fadeIn">Welcome to Jio SafeNet</h2>
+          <div className="bg-white p-6 rounded-xl shadow-lg mb-6 animate-fadeIn">
+            <div className="flex items-center space-x-4">
+              <i className="fas fa-shield-alt text-green-500 text-3xl"></i>
+              <div>
+                <p className="text-green-600 font-semibold text-lg">Status: Active</p>
+                <p className="text-gray-600">All devices are within safe zones.</p>
+              </div>
+            </div>
           </div>
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <button class="bg-blue-500 text-white p-2 rounded" onClick={() => setCurrentPage('geofencing')}>
-              Geofencing Settings
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <button
+              className="bg-blue-500 text-white p-6 rounded-xl shadow-lg card-hover flex items-center space-x-4"
+              onClick={() => setCurrentPage('geofencing')}
+            >
+              <i className="fas fa-map-marker-alt text-2xl"></i>
+              <span className="font-semibold">Geofencing Settings</span>
             </button>
-            <button class="bg-blue-500 text-white p-2 rounded" onClick={() => setCurrentPage('browsing')}>
-              Safe Browsing
+            <button
+              className="bg-blue-500 text-white p-6 rounded-xl shadow-lg card-hover flex items-center space-x-4"
+              onClick={() => setCurrentPage('browsing')}
+            >
+              <i className="fas fa-globe text-2xl"></i>
+              <span className="font-semibold">Safe Browsing</span>
             </button>
-            <button class="bg-blue-500 text-white p-2 rounded" onClick={() => setCurrentPage('screenTime')}>
-              Screen Time
+            <button
+              className="bg-blue-500 text-white p-6 rounded-xl shadow-lg card-hover flex items-center space-x-4"
+              onClick={() => setCurrentPage('screenTime')}
+            >
+              <i className="fas fa-clock text-2xl"></i>
+              <span className="font-semibold">Screen Time</span>
             </button>
-            <button class="bg-blue-500 text-white p-2 rounded" onClick={() => setCurrentPage('notifications')}>
-              View Alerts
+            <button
+              className="bg-blue-500 text-white p-6 rounded-xl shadow-lg card-hover flex items-center space-x-4"
+              onClick={() => setCurrentPage('notifications')}
+            >
+              <i className="fas fa-bell text-2xl"></i>
+              <span className="font-semibold">View Alerts</span>
             </button>
           </div>
-          <div class="bg-white p-4 rounded-lg shadow">
-            <h3 class="text-lg font-semibold mb-2">Recent Alerts</h3>
-            <p class="text-red-600">🚨 SOS: Emergency alert sent to +16479669317 at 4:08 PM, May 18, 2025</p>
-            <p class="text-red-600">🚨 Exit Alert: Child exited School Safe Zone at 3:15 PM, notified +16479669317</p>
-            <p class="text-gray-600">Child entered Park Safe Zone at 2:30 PM</p>
+          <div className="bg-white p-6 rounded-xl shadow-lg animate-fadeIn">
+            <h3 className="text-xl font-semibold mb-4 text-gray-700">Recent Alerts</h3>
+            <div className="space-y-3">
+              <p className="text-red-600 flex items-center">
+                <i className="fas fa-exclamation-circle mr-2"></i>
+                SOS: Emergency alert sent to +16479669317 at 4:08 PM, May 18, 2025
+              </p>
+              <p className="text-red-600 flex items-center">
+                <i className="fas fa-exclamation-circle mr-2"></i>
+                Exit Alert: Child exited School Safe Zone at 3:15 PM, notified +16479669317
+              </p>
+              <p className="text-gray-600 flex items-center">
+                <i className="fas fa-check-circle mr-2"></i>
+                Child entered Park Safe Zone at 2:30 PM
+              </p>
+            </div>
           </div>
         </div>
       );
@@ -141,30 +189,30 @@
         };
 
         return (
-          <div class="p-4">
-            <h2 class="text-2xl font-bold mb-4">Safe Browsing Control</h2>
+          <div className="p-6">
+            <h2 className="text-3xl font-bold mb-6 text-gray-800">Safe Browsing Control</h2>
             {saveMessage && (
-              <p class="text-green-600 font-semibold mb-4">{saveMessage}</p>
+              <p className="text-green-600 font-semibold mb-4">{saveMessage}</p>
             )}
-            <div class="bg-white p-4 rounded-lg shadow mb-4">
-              <h3 class="text-lg font-semibold mb-2">Age-Based Filtering</h3>
-              <select class="w-full p-2 border rounded mb-4" value={ageFilter} onChange={handleAgeFilterChange}>
+            <div className="bg-white p-6 rounded-xl shadow-lg mb-6">
+              <h3 className="text-xl font-semibold mb-2 text-gray-700">Age-Based Filtering</h3>
+              <select className="w-full p-3 border rounded-lg mb-4 focus:ring-2 focus:ring-blue-500" value={ageFilter} onChange={handleAgeFilterChange}>
                 <option>Under 10</option>
                 <option>10-13</option>
                 <option>14-17</option>
               </select>
-              <h3 class="text-lg font-semibold mb-2">Manual Site Blocking</h3>
-              <input type="text" placeholder="Enter URL to block" class="w-full p-2 border rounded mb-2" />
-              <button class="bg-red-500 text-white p-2 rounded w-full mb-4">Block Site</button>
-              <h3 class="text-lg font-semibold mb-2">Browsing History</h3>
-              <p>example.com - 10:15 AM</p>
-              <p>safe-site.org - 9:30 AM</p>
+              <h3 className="text-xl font-semibold mb-2 text-gray-700">Manual Site Blocking</h3>
+              <input type="text" placeholder="Enter URL to block" className="w-full p-3 border rounded-lg mb-4 focus:ring-2 focus:ring-blue-500" />
+              <button className="bg-red-500 text-white p-3 rounded-lg w-full mb-4 hover:bg-red-600 transition">Block Site</button>
+              <h3 className="text-xl font-semibold mb-2 text-gray-700">Browsing History</h3>
+              <p className="text-gray-600">example.com - 10:15 AM</p>
+              <p className="text-gray-600">safe-site.org - 9:30 AM</p>
             </div>
-            <div class="flex space-x-4">
-              <button class="bg-gray-500 text-white p-2 rounded w-full" onClick={() => setCurrentPage('dashboard')}>
+            <div className="flex space-x-4">
+              <button className="bg-gray-500 text-white p-3 rounded-lg w-full hover:bg-gray-600 transition" onClick={() => setCurrentPage('dashboard')}>
                 Back to Dashboard
               </button>
-              <button class="bg-blue-500 text-white p-2 rounded w-full" onClick={handleSave}>
+              <button className="bg-blue-500 text-white p-3 rounded-lg w-full hover:bg-blue-600 transition" onClick={handleSave}>
                 Save
               </button>
             </div>
@@ -219,70 +267,70 @@
           : 'Do Not Disturb: Not set';
 
         return (
-          <div class="p-4">
-            <h2 class="text-2xl font-bold mb-4">Screen Time Settings</h2>
+          <div className="p-6">
+            <h2 className="text-3xl font-bold mb-6 text-gray-800">Screen Time Settings</h2>
             {saveMessage && (
-              <p class="text-green-600 font-semibold mb-4">{saveMessage}</p>
+              <p className="text-green-600 font-semibold mb-4">{saveMessage}</p>
             )}
-            <div class="bg-white p-4 rounded-lg shadow mb-4">
-              <h3 class="text-lg font-semibold mb-2">Daily Limit</h3>
+            <div className="bg-white p-6 rounded-xl shadow-lg mb-6">
+              <h3 className="text-xl font-semibold mb-2 text-gray-700">Daily Limit</h3>
               <input
                 type="range"
                 min="0"
                 max="8"
                 value={screenTimeLimit}
                 onChange={handleSliderChange}
-                class="w-full mb-4"
+                className="w-full mb-4 accent-blue-500"
               />
-              <p>Current Limit: {screenTimeLimit} hours/day</p>
+              <p className="text-gray-600">Current Limit: {screenTimeLimit} hours/day</p>
 
-              <h3 class="text-lg font-semibold mb-2 mt-4">Do Not Disturb Hours</h3>
-              <div class="mb-4">
-                <p class="font-semibold mb-2">Select Days:</p>
-                <div class="grid grid-cols-2 gap-2">
+              <h3 className="text-xl font-semibold mb-2 mt-4 text-gray-700">Do Not Disturb Hours</h3>
+              <div className="mb-4">
+                <p className="font-semibold mb-2 text-gray-700">Select Days:</p>
+                <div className="grid grid-cols-2 gap-2">
                   {Object.keys(dndDays).map(day => (
-                    <label key={day} class="flex items-center">
+                    <label key={day} className="flex items-center">
                       <input
                         type="checkbox"
                         checked={dndDays[day]}
                         onChange={() => handleDayChange(day)}
-                        class="mr-2"
+                        className="mr-2 accent-blue-500"
                       />
                       {day}
                     </label>
                   ))}
                 </div>
               </div>
-              <div class="mb-4">
-                <p class="font-semibold mb-2">Set Time Range:</p>
-                <div class="flex space-x-4">
+              <div className="mb-4">
+                <p className="font-semibold mb-2 text-gray-700">Set Time Range:</p>
+                <div className="flex space-x-4">
                   <input
                     type="time"
                     value={dndStartTime}
                     onChange={handleStartTimeChange}
-                    class="p-2 border rounded w-full"
+                    className="p-3 border rounded-lg w-full focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="time"
                     value={dndEndTime}
                     onChange={handleEndTimeChange}
-                    class="p-2 border rounded w-full"
+                    className="p-3 border rounded-lg w-full focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
-              <p class="text-gray-600">{dndSummary}</p>
+              <p className="text-gray-600">{dndSummary}</p>
 
-              <h3 class="text-lg font-semibold mb-2 mt-4">Usage Insights</h3>
-              <p>Today: 2h 15m</p>
-              <p>Yesterday: 3h 10m</p>
-              <h3 class="text-lg font-semibold mb-2 mt-4">Smart Recommendations</h3>
-              <p>Reduce gaming apps by 30 min for balanced usage.</p>
+              <h3 className="text-xl font-semibold mb-2 mt-4 text-gray-700">Usage Insights</h3>
+              <p className="text-gray-600">Today: 2h 15m</p>
+              <p className="text-gray-600">Yesterday: 3h 10m</p>
+              <h3 className="text-xl font-semibold mb-2 mt-4 text-gray-700">Smart Recommendations</h3>
+              <p className="text-gray-600">Reduce gaming apps by 30 min for balanced usage.</p>
             </div>
-            <div class="flex space-x-4">
-              <button class="bg-gray-500 text-white p-2 rounded w-full" onClick={() => setCurrentPage('dashboard')}>
+            <div className="flex space-x-4">
+              <button className="bg-gray-500 text-white p-3 rounded-lg w-full hover:bg-gray-600 transition" onClick={() => setCurrentPage('dashboard')}>
                 Back to Dashboard
               </button>
-              <button class="bg-blue-500 text-white p-2 rounded w-full" onClick={handleSave}>
+              <button className="bg-blue-500 text-white p-3 rounded-lg w-full hover:bg-blue-600 transition" onClick={handleSave}>
                 Save
               </button>
             </div>
@@ -292,103 +340,113 @@
 
       // Notifications Page
       const NotificationsPage = () => (
-        <div class="p-4">
-          <h2 class="text-2xl font-bold mb-4">Notifications & Reports</h2>
-          <div class="bg-white p-4 rounded-lg shadow mb-4">
+        <div className="p-6">
+          <h2 className="text-3xl font-bold mb-6 text-gray-800">Notifications & Reports</h2>
+          <div className="bg-white p-6 rounded-xl shadow-lg mb-6">
             {showExitAlert && (
-              <div class="bg-red-100 border-l-4 border-red-500 p-4 mb-4 rounded flex justify-between items-center">
+              <div className="bg-red-100 border-l-4 border-red-500 p-4 mb-4 rounded flex justify-between items-center">
                 <div>
-                  <p class="text-red-700 font-semibold">🚨 Exit Alert</p>
-                  <p class="text-red-600">Child exited Gomti Nagar School Safe Zone at 3:15 PM</p>
-                  <p class="text-gray-600 text-sm">Text sent to +16479669317: Exit Alert: Child left Gomti Nagar School Safe Zone at 3:15 PM</p>
+                  <p className="text-red-700 font-semibold">🚨 Exit Alert</p>
+                  <p className="text-red-600">Child exited Gomti Nagar School Safe Zone at 3:15 PM</p>
+                  <p className="text-gray-600 text-sm">Text sent to +16479669317: Exit Alert: Child left Gomti Nagar School Safe Zone at 3:15 PM</p>
                 </div>
-                <button class="text-red-500 font-semibold" onClick={dismissExitAlert}>Dismiss</button>
+                <button className="text-red-500 font-semibold" onClick={dismissExitAlert}>Dismiss</button>
               </div>
             )}
-            <h3 class="text-lg font-semibold mb-2">Real-Time Alerts</h3>
-            <p class="text-red-600">🚨 SOS: Emergency alert sent to +16479669317 at 4:08 PM, May 18, 2025</p>
-            <p class="text-red-600">🚨 Exit Alert: Child exited School Safe Zone at 3:15 PM, notified +16479669317</p>
-            <p class="text-gray-600">Child entered Park Safe Zone at 2:30 PM</p>
-            <h3 class="text-lg font-semibold mb-2 mt-4">Weekly Reports</h3>
-            <p>Last report: Sent May 16, 2025</p>
-            <button class="bg-blue-500 text-white p-2 rounded w-full mt-2">View Latest Report</button>
+            <h3 className="text-xl font-semibold mb-2 text-gray-700">Real-Time Alerts</h3>
+            <p className="text-red-600">🚨 SOS: Emergency alert sent to +16479669317 at 4:08 PM, May 18, 2025</p>
+            <p className="text-red-600">🚨 Exit Alert: Child exited School Safe Zone at 3:15 PM, notified +16479669317</p>
+            <p className="text-gray-600">Child entered Park Safe Zone at 2:30 PM</p>
+            <h3 className="text-xl font-semibold mb-2 mt-4 text-gray-700">Weekly Reports</h3>
+            <p className="text-gray-600">Last report: Sent May 16, 2025</p>
+            <button className="bg-blue-500 text-white p-3 rounded-lg w-full mt-2 hover:bg-blue-600 transition">View Latest Report</button>
           </div>
-          <button class="bg-gray-500 text-white p-2 rounded w-full" onClick={() => setCurrentPage('dashboard')}>
+          <button className="bg-gray-500 text-white p-3 rounded-lg w-full hover:bg-gray-600 transition" onClick={() => setCurrentPage('dashboard')}>
             Back to Dashboard
           </button>
         </div>
       );
 
       return (
-        <div class="min-h-screen bg-gray-100">
-          {/* Header with SOS Button */}
-          <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold">Jio SafeNet</h1>
-            <div class="flex items-center space-x-4">
-              <span>Parent Account</span>
-              <button
-                class="bg-red-600 text-white px-3 py-1 rounded-full font-semibold"
-                onClick={triggerSos}
-              >
-                SOS
-              </button>
-              <button onClick={toggleSidebar}>⚙️</button>
-            </div>
-          </header>
-
-          {/* SOS Modal */}
-          {showSosModal && (
-            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-                <h3 class="text-lg font-bold text-red-600 mb-2">🚨 SOS Alert</h3>
-                <p class="text-gray-700">Text sent to +16479669317: SOS: Emergency alert from Jio SafeNet at 04:08 PM, May 18, 2025</p>
-                <p class="text-gray-600 text-sm mt-2">Contact notified: Emergency Contact (+16479669317)</p>
-                <button
-                  class="bg-blue-500 text-white p-2 rounded w-full mt-4"
-                  onClick={closeSosModal}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Toast Notification */}
-          {showToast && (
-            <div class="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50">
-              <p>Settings saved!</p>
-            </div>
-          )}
-
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 flex">
           {/* Sidebar */}
-          <div class={`fixed inset-y-0 left-0 w-64 bg-white shadow-lg transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 md:relative md:translate-x-0`}>
-            <div class="p-4">
-              <h2 class="text-lg font-semibold mb-4">Menu</h2>
-              <nav class="space-y-2">
-                <button class="w-full text-left p-2 hover:bg-blue-100 rounded" onClick={() => { setCurrentPage('geofencing'); setIsSidebarOpen(false); }}>
-                  📍 Geofencing
+          <div className={`fixed inset-y-0 left-0 w-full md:w-1/4 bg-white shadow-lg transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 md:translate-x-0 md:static md:shadow-none border-r border-gray-200`}>
+            <div className="p-4">
+              <h2 className="text-xl font-semibold mb-4 text-gray-800">Menu</h2>
+              <nav className="space-y-2">
+                <button className="w-full text-left p-3 hover:bg-blue-50 rounded flex items-center" onClick={() => { setCurrentPage('geofencing'); setIsSidebarOpen(false); }}>
+                  <i className="fas fa-map-marker-alt mr-2"></i>
+                  Geofencing
                 </button>
-                <button class="w-full text-left p-2 hover:bg-blue-100 rounded" onClick={() => { setCurrentPage('browsing'); setIsSidebarOpen(false); }}>
-                  🔍 Safe Browsing
+                <button className="w-full text-left p-3 hover:bg-blue-50 rounded flex items-center" onClick={() => { setCurrentPage('browsing'); setIsSidebarOpen(false); }}>
+                  <i className="fas fa-globe mr-2"></i>
+                  Safe Browsing
                 </button>
-                <button class="w-full text-left p-2 hover:bg-blue-100 rounded" onClick={() => { setCurrentPage('screenTime'); setIsSidebarOpen(false); }}>
-                  ⏳ Screen Time
+                <button className="w-full text-left p-3 hover:bg-blue-50 rounded flex items-center" onClick={() => { setCurrentPage('screenTime'); setIsSidebarOpen(false); }}>
+                  <i className="fas fa-clock mr-2"></i>
+                  Screen Time
                 </button>
-                <button class="w-full text-left p-2 hover:bg-blue-100 rounded" onClick={() => { setCurrentPage('notifications'); setIsSidebarOpen(false); }}>
-                  ⚡ Notifications
+                <button className="w-full text-left p-3 hover:bg-blue-50 rounded flex items-center" onClick={() => { setCurrentPage('notifications'); setIsSidebarOpen(false); }}>
+                  <i className="fas fa-bell mr-2"></i>
+                  Notifications
                 </button>
               </nav>
             </div>
           </div>
 
           {/* Main Content */}
-          <main class="md:ml-64">
-            {currentPage === 'dashboard' && <Dashboard />}
-            {currentPage === 'geofencing' && <GeofencingPage />}
-            {currentPage === 'browsing' && <SafeBrowsingPage />}
-            {currentPage === 'screenTime' && <ScreenTimePage />}
-            {currentPage === 'notifications' && <NotificationsPage />}
-          </main>
+          <div className="flex-1">
+            {/* Header with SOS Button */}
+            <header className="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
+              <h1 className="text-2xl font-bold">Jio SafeNet</h1>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm">Parent Account</span>
+                <button
+                  className="bg-red-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-red-700 transition"
+                  onClick={triggerSos}
+                >
+                  SOS
+                </button>
+                <button className="text-2xl" onClick={toggleSidebar}><i className="fas fa-bars"></i></button>
+              </div>
+            </header>
+
+            {/* SOS Modal */}
+            {showSosModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full animate-fadeIn">
+                  <h3 className="text-xl font-bold text-red-600 mb-2 flex items-center">
+                    <i className="fas fa-exclamation-circle mr-2"></i>
+                    SOS Alert
+                  </h3>
+                  <p className="text-gray-700">Text sent to +16479669317: SOS: Emergency alert from Jio SafeNet at 04:08 PM, May 18, 2025</p>
+                  <p className="text-gray-600 text-sm mt-2">Contact notified: Emergency Contact (+16479669317)</p>
+                  <button
+                    className="bg-blue-500 text-white p-3 rounded-lg w-full mt-4 hover:bg-blue-600 transition"
+                    onClick={closeSosModal}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Toast Notification */}
+            {showToast && (
+              <div className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 animate-fadeIn">
+                <p>Settings saved!</p>
+              </div>
+            )}
+
+            {/* Main Content */}
+            <main>
+              {currentPage === 'dashboard' && <Dashboard />}
+              {currentPage === 'geofencing' && <GeofencingPage />}
+              {currentPage === 'browsing' && <SafeBrowsingPage />}
+              {currentPage === 'screenTime' && <ScreenTimePage />}
+              {currentPage === 'notifications' && <NotificationsPage />}
+            </main>
+          </div>
         </div>
       );
     }
