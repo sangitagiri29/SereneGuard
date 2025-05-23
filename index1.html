@@ -50,33 +50,178 @@
       const dismissExitAlert = () => setShowExitAlert(false);
       const triggerSos = () => setShowSosModal(true);
       const closeSosModal = () => setShowSosModal(false);
-      const triggerToast = () => {
-        setShowToast(true);
+      const triggerToast = (message) => {
+        setShowToast(message);
         setTimeout(() => setShowToast(false), 3000);
       };
 
       // Geofencing Page
       const GeofencingPage = () => {
         const [saveMessage, setSaveMessage] = React.useState('');
+        const [alertMessage, setAlertMessage] = React.useState('');
+        const [safeZones, setSafeZones] = React.useState(() => {
+          const saved = localStorage.getItem('safeZones');
+          return saved ? JSON.parse(saved) : [
+            { name: 'Gomti Nagar School', lat: 26.8489, lng: 80.9470, radius: 500 }
+          ];
+        });
+        const [childLocation, setChildLocation] = React.useState(() => {
+          const saved = localStorage.getItem('childLocation');
+          return saved ? JSON.parse(saved) : [26.8489, 80.9470]; // Start at Gomti Nagar
+        });
+        const [notifyOnExit, setNotifyOnExit] = React.useState(() => localStorage.getItem('notifyOnExit') === 'true');
+        const mapRef = React.useRef(null);
+        const childMarkerRef = React.useRef(null);
 
+        // Haversine formula to calculate distance (in meters)
+        const getDistance = (lat1, lng1, lat2, lng2) => {
+          const R = 6371e3; // Earth's radius in meters
+          const φ1 = lat1 * Math.PI / 180;
+          const φ2 = lat2 * Math.PI / 180;
+          const Δφ = (lat2 - lat1) * Math.PI / 180;
+          const Δλ = (lng2 - lng1) * Math.PI / 180;
+          const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                    Math.cos(φ1) * Math.cos(φ2) *
+                    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          return R * c;
+        };
+
+        // Check if child is in a safe zone
+        const checkSafeZones = (location) => {
+          for (const zone of safeZones) {
+            const distance = getDistance(location[0], location[1], zone.lat, zone.lng);
+            if (distance <= zone.radius) {
+              return { inZone: true, zoneName: zone.name };
+            }
+          }
+          return { inZone: false, zoneName: '' };
+        };
+
+        // Initialize map and markers
         React.useEffect(() => {
-          const map = L.map('map').setView([26.8489, 80.9470], 14);
+          const map = L.map('map').setView(childLocation, 14);
+          mapRef.current = map;
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           }).addTo(map);
-          L.circle([26.8489, 80.9470], {
-            color: 'blue',
-            fillColor: '#30f',
-            fillOpacity: 0.2,
-            radius: 500
-          }).addTo(map).bindPopup('Gomti Nagar School Safe Zone');
-          L.marker([26.8489, 80.9470]).addTo(map).bindPopup('Gomti Nagar Center').openPopup();
+
+          safeZones.forEach(zone => {
+            L.circle([zone.lat, zone.lng], {
+              color: 'blue',
+              fillColor: '#30f',
+              fillOpacity: 0.2,
+              radius: zone.radius
+            }).addTo(map).bindPopup(`${zone.name} Safe Zone`);
+            L.marker([zone.lat, zone.lng]).addTo(map).bindPopup(`${zone.name} Center`);
+          });
+
+          const redIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34]
+          });
+          childMarkerRef.current = L.marker(childLocation, { icon: redIcon })
+            .addTo(map)
+            .bindPopup('Child Location')
+            .openPopup();
+
+          return () => map.remove();
         }, []);
 
+        // Update child marker and check geofencing
+        React.useEffect(() => {
+          if (childMarkerRef.current) {
+            childMarkerRef.current.setLatLng(childLocation);
+            const { inZone, zoneName } = checkSafeZones(childLocation);
+            const prevState = localStorage.getItem('childInZone') === 'true';
+            if (inZone && !prevState) {
+              setAlertMessage(`Child entered ${zoneName} Safe Zone`);
+              triggerToast(`Child entered ${zoneName} Safe Zone`);
+              localStorage.setItem('childInZone', 'true');
+            } else if (!inZone && prevState && notifyOnExit) {
+              setAlertMessage(`Child exited ${zoneName || 'a safe zone'}`);
+              triggerToast(`Child exited ${zoneName || 'a safe zone'}`);
+              localStorage.setItem('childInZone', 'false');
+            }
+            localStorage.setItem('childLocation', JSON.stringify(childLocation));
+            mapRef.current.setView(childLocation, 14);
+          }
+        }, [childLocation]);
+
         const handleSave = () => {
-          setSaveMessage('Geofencing settings saved: 2 safe zones, Notify on Exit enabled to +16479669317');
-          triggerToast();
+          localStorage.setItem('safeZones', JSON.stringify(safeZones));
+          localStorage.setItem('notifyOnExit', notifyOnExit);
+          setSaveMessage(`Geofencing settings saved: ${safeZones.length} safe zone(s), Notify on Exit ${notifyOnExit ? 'enabled' : 'disabled'} to +16479669317`);
+          triggerToast('Settings saved');
         };
+
+        const handleAddSafeZone = () => {
+          const newZone = {
+            name: `Safe Zone ${safeZones.length + 1}`,
+            lat: 26.8489 + (Math.random() - 0.5) * 0.01,
+            lng: 80.9470 + (Math.random() - 0.5) * 0.01,
+            radius: 500
+          };
+          setSafeZones([...safeZones, newZone]);
+          setSaveMessage(`Added new safe zone: ${newZone.name}`);
+          triggerToast(`Added safe zone: ${newZone.name}`);
+        };
+
+        const handleNotifyOnExitChange = () => {
+          setNotifyOnExit(!notifyOnExit);
+        };
+
+        const handleLocateChild = () => {
+          // Simulate refreshing child location (in real app, this would fetch GPS)
+          const { inZone, zoneName } = checkSafeZones(childLocation);
+          setAlertMessage(`Child located at [${childLocation[0].toFixed(4)}, ${childLocation[1].toFixed(4)}], ${inZone ? `In ${zoneName} Safe Zone` : 'Outside safe zone'}`);
+          triggerToast('Child location updated');
+          mapRef.current.setView(childLocation, 14);
+        };
+
+        const handleNavigateToChild = () => {
+          const url = `https://www.google.com/maps?q=${childLocation[0]},${childLocation[1]}`;
+          window.open(url, '_blank');
+          setAlertMessage(`Opened Google Maps to navigate to child's location: [${childLocation[0].toFixed(4)}, ${childLocation[1].toFixed(4)}]`);
+          triggerToast('Navigating to child');
+        };
+
+        const handleSendDirections = () => {
+          // Send directions to the nearest safe zone or home ([26.8495, 80.9465])
+          const home = [26.8495, 80.9465];
+          let target = home;
+          let targetName = 'Home';
+          let minDistance = getDistance(childLocation[0], childLocation[1], home[0], home[1]);
+          for (const zone of safeZones) {
+            const distance = getDistance(childLocation[0], childLocation[1], zone.lat, zone.lng);
+            if (distance < minDistance) {
+              minDistance = distance;
+              target = [zone.lat, zone.lng];
+              targetName = zone.name;
+            }
+          }
+          const url = `https://www.google.com/maps?q=${target[0]},${target[1]}`;
+          setAlertMessage(`Directions sent to child: Google Maps link to ${targetName} [${target[0].toFixed(4)}, ${target[1].toFixed(4)}]`);
+          triggerToast(`Directions sent to ${targetName}`);
+        };
+
+        // Test movement
+        const moveChild = (direction) => {
+          const step = 0.005; // ~500m
+          let newLocation = [...childLocation];
+          switch (direction) {
+            case 'north': newLocation[0] += step; break;
+            case 'south': newLocation[0] -= step; break;
+            case 'east': newLocation[1] += step; break;
+            case 'west': newLocation[1] -= step; break;
+          }
+          setChildLocation(newLocation);
+        };
+
+        const { inZone, zoneName } = checkSafeZones(childLocation);
+        const locationStatus = `Child Location: [${childLocation[0].toFixed(4)}, ${childLocation[1].toFixed(4)}], ${inZone ? `In ${zoneName} Safe Zone` : 'Outside safe zone'}`;
 
         return (
           <div className="p-6 max-w-7xl mx-auto">
@@ -84,18 +229,86 @@
             {saveMessage && (
               <p className="text-green-600 font-semibold mb-4">{saveMessage}</p>
             )}
+            {alertMessage && (
+              <p className="text-green-600 font-semibold mb-4">{alertMessage}</p>
+            )}
             <div className="bg-white p-6 rounded-xl shadow-lg mb-6">
               <div id="map" className="w-full h-64 rounded-lg mb-4"></div>
-              <button className="bg-gradient-to-r from-green-500 to-green-600 text-white p-3 rounded-lg w-full mb-4 hover:from-green-600 hover:to-green-700 transition">Add Safe Zone</button>
+              <div className="mb-4">
+                <h3 className="text-xl font-semibold text-gray-700">Child Location Status</h3>
+                <p className="text-gray-600">{locationStatus}</p>
+                <div className="flex space-x-2 mt-2">
+                  <button
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
+                    onClick={handleLocateChild}
+                  >
+                    Locate Child
+                  </button>
+                  <button
+                    className="bg-gradient-to-r from-green-500 to-green-600 text-white p-2 rounded-lg hover:from-green-600 hover:to-green-700 transition"
+                    onClick={handleNavigateToChild}
+                  >
+                    Navigate to Child
+                  </button>
+                  <button
+                    className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition"
+                    onClick={handleSendDirections}
+                  >
+                    Send Directions to Child
+                  </button>
+                </div>
+              </div>
+              <button
+                className="bg-gradient-to-r from-green-500 to-green-600 text-white p-3 rounded-lg w-full mb-4 hover:from-green-600 hover:to-green-700 transition"
+                onClick={handleAddSafeZone}
+              >
+                Add Safe Zone
+              </button>
               <div className="mb-4">
                 <h3 className="text-xl font-semibold text-gray-700">Safe Zones</h3>
-                <p className="text-gray-600">Home: 123 Vibhuti Khand, Gomti Nagar</p>
-                <p className="text-gray-600">School: 456 Vinay Khand, Gomti Nagar</p>
+                {safeZones.map((zone, index) => (
+                  <p key={index} className="text-gray-600">{zone.name}: [{zone.lat.toFixed(4)}, {zone.lng.toFixed(4)}], {zone.radius}m</p>
+                ))}
+              </div>
+              <div className="mb-4">
+                <h3 className="text-xl font-semibold text-gray-700">Test Child Movement</h3>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  <button
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
+                    onClick={() => moveChild('north')}
+                  >
+                    Move North
+                  </button>
+                  <button
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
+                    onClick={() => moveChild('south')}
+                  >
+                    Move South
+                  </button>
+                  <button
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
+                    onClick={() => moveChild('east')}
+                  >
+                    Move East
+                  </button>
+                  <button
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
+                    onClick={() => moveChild('west')}
+                  >
+                    Move West
+                  </button>
+                </div>
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-gray-700">Custom Alerts</h3>
                 <label className="block mb-2">
-                  <input type="checkbox" className="mr-2 accent-blue-500" checked /> Notify on Exit (Text to +16479669317)
+                  <input
+                    type="checkbox"
+                    className="mr-2 accent-blue-500"
+                    checked={notifyOnExit}
+                    onChange={handleNotifyOnExitChange}
+                  />
+                  Notify on Exit (Text to +16479669317)
                 </label>
                 <label className="block mb-2">
                   <input type="checkbox" className="mr-2 accent-blue-500" /> Notify on Enter
@@ -103,15 +316,23 @@
                 <div>
                   <h3 className="text-xl font-semibold text-gray-700">Emergency Contacts</h3>
                   <p className="text-gray-600">Emergency Contact: +16479669317</p>
-                  <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-lg mt-2 hover:from-blue-600 hover:to-blue-700 transition">Add Contact</button>
+                  <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-lg mt-2 hover:from-blue-600 hover:to-blue-700 transition">
+                    Add Contact
+                  </button>
                 </div>
               </div>
             </div>
             <div className="flex space-x-4">
-              <button className="bg-gradient-to-r from-gray-500 to-gray-600 text-white p-3 rounded-lg w-full hover:from-gray-600 hover:to-gray-700 transition" onClick={() => setCurrentPage('dashboard')}>
+              <button
+                className="bg-gradient-to-r from-gray-500 to-gray-600 text-white p-3 rounded-lg w-full hover:from-gray-600 hover:to-gray-700 transition"
+                onClick={() => setCurrentPage('dashboard')}
+              >
                 Back to Dashboard
               </button>
-              <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-lg w-full hover:from-blue-600 hover:to-blue-700 transition" onClick={handleSave}>
+              <button
+                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-lg w-full hover:from-blue-600 hover:to-blue-700 transition"
+                onClick={handleSave}
+              >
                 Save
               </button>
             </div>
@@ -200,7 +421,6 @@
         });
         const [tempTimeLimits, setTempTimeLimits] = React.useState({});
 
-        // Load settings on mount
         React.useEffect(() => {
           const savedAgeFilter = localStorage.getItem('ageFilter');
           const savedBlockedSites = localStorage.getItem('blockedSites');
@@ -215,28 +435,25 @@
         };
 
         const handleSave = () => {
-          // Save to localStorage
           localStorage.setItem('ageFilter', ageFilter);
           localStorage.setItem('blockedSites', JSON.stringify(blockedSites));
           localStorage.setItem('timeLimits', JSON.stringify(timeLimits));
-
-          // Generate detailed save message
           const blockedText = blockedSites.length > 0 ? `Blocked: ${blockedSites.join(', ')}` : 'No sites blocked';
           const limitsText = Object.keys(timeLimits).length > 0
             ? `Time Limits: ${Object.entries(timeLimits).map(([site, min]) => `${site} (${min} min/day)`).join(', ')}`
             : 'No time limits set';
           setSaveMessage(`Settings saved: Age filter set to ${ageFilter}. ${blockedText}. ${limitsText}.`);
-          triggerToast();
+          triggerToast('Settings saved');
         };
 
         const handleBlockSite = (website) => {
           if (!blockedSites.includes(website)) {
             setBlockedSites([...blockedSites, website]);
             setSaveMessage(`Site ${website} has been blocked.`);
-            triggerToast();
+            triggerToast(`Blocked ${website}`);
           } else {
             setSaveMessage(`Site ${website} is already blocked.`);
-            triggerToast();
+            triggerToast(`${website} already blocked`);
           }
         };
 
@@ -249,14 +466,13 @@
           if (limit && limit > 0) {
             setTimeLimits({ ...timeLimits, [website]: parseInt(limit) });
             setSaveMessage(`Time limit for ${website} set to ${limit} minutes/day.`);
-            triggerToast();
+            triggerToast(`Time limit set for ${website}`);
           } else {
             setSaveMessage(`Please enter a valid time limit for ${website}.`);
-            triggerToast();
+            triggerToast('Invalid time limit');
           }
         };
 
-        // Simulated browsing history data with duration
         const browsingHistory = [
           { website: 'example.com', time: '10:15 AM, May 22, 2025', duration: '5 min' },
           { website: 'instagram.com', time: '9:45 AM, May 22, 2025', duration: '30 min' },
@@ -369,7 +585,6 @@
         const [dndEndTime, setDndEndTime] = React.useState(() => localStorage.getItem('dndEndTime') || '06:00');
         const [saveMessage, setSaveMessage] = React.useState('');
 
-        // Load settings on mount
         React.useEffect(() => {
           const savedScreenTimeLimit = localStorage.getItem('screenTimeLimit');
           const savedDndDays = localStorage.getItem('dndDays');
@@ -398,19 +613,16 @@
         };
 
         const handleSave = () => {
-          // Save to localStorage
           localStorage.setItem('screenTimeLimit', screenTimeLimit);
           localStorage.setItem('dndDays', JSON.stringify(dndDays));
           localStorage.setItem('dndStartTime', dndStartTime);
           localStorage.setItem('dndEndTime', dndEndTime);
-
-          // Generate detailed save message
           const selectedDays = Object.keys(dndDays).filter(day => dndDays[day]).join(', ') || 'None';
           const dndText = selectedDays !== 'None'
             ? `Do Not Disturb on ${selectedDays} from ${dndStartTime} to ${dndEndTime}`
             : 'Do Not Disturb not set';
           setSaveMessage(`Screen Time settings saved: ${screenTimeLimit} hours/day, ${dndText}`);
-          triggerToast();
+          triggerToast('Settings saved');
         };
 
         const selectedDays = Object.keys(dndDays).filter(day => dndDays[day]).join(', ') || 'None';
@@ -435,7 +647,6 @@
                 className="w-full mb-4 accent-blue-500"
               />
               <p className="text-gray-600">Current Limit: {screenTimeLimit} hours/day</p>
-
               <h3 className="text-xl font-semibold mb-2 mt-4 text-gray-700">Do Not Disturb Hours</h3>
               <div className="mb-4">
                 <p className="font-semibold mb-2 text-gray-700">Select Days:</p>
@@ -471,7 +682,6 @@
                 </div>
               </div>
               <p className="text-gray-600">{dndSummary}</p>
-
               <h3 className="text-xl font-semibold mb-2 mt-4 text-gray-700">Usage Insights</h3>
               <p className="text-gray-600">Today: 2h 15m</p>
               <p className="text-gray-600">Yesterday: 3h 10m</p>
@@ -533,7 +743,6 @@
 
       return (
         <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col">
-          {/* Header with SOS Button */}
           <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 flex justify-between items-center shadow-md sticky top-0 z-40">
             <h1 className="text-2xl font-bold flex items-center">
               <i className="fas fa-shield-alt mr-2"></i>
@@ -552,9 +761,7 @@
               </button>
             </div>
           </header>
-
           <div className="flex flex-1">
-            {/* Sidebar */}
             <div className={`sidebar fixed inset-y-0 left-0 w-64 bg-white shadow-xl z-50 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:min-h-screen md:shadow-none md:bg-gradient-to-b from-blue-50 to-white transition-transform duration-300`}>
               <div className="p-4 flex flex-col h-full">
                 <div className="flex items-center justify-between mb-6">
@@ -586,13 +793,9 @@
                 </nav>
               </div>
             </div>
-
-            {/* Overlay for mobile sidebar */}
             {isSidebarOpen && (
               <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={toggleSidebar}></div>
             )}
-
-            {/* Main Content */}
             <main className="flex-1 w-full">
               {currentPage === 'dashboard' && <Dashboard />}
               {currentPage === 'geofencing' && <GeofencingPage />}
@@ -601,8 +804,6 @@
               {currentPage === 'notifications' && <NotificationsPage />}
             </main>
           </div>
-
-          {/* SOS Modal */}
           {showSosModal && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full animate-fadeIn">
@@ -621,11 +822,9 @@
               </div>
             </div>
           )}
-
-          {/* Toast Notification */}
           {showToast && (
             <div className="fixed bottom-4 right-4 bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg shadow-lg z-50 animate-fadeIn">
-              <p>Settings saved!</p>
+              <p>{showToast}</p>
             </div>
           )}
         </div>
