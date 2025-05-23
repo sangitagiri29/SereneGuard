@@ -352,19 +352,34 @@
 
       // Screen Time Page
       const ScreenTimePage = () => {
-        const [screenTimeLimit, setScreenTimeLimit] = React.useState(4);
-        const [dndDays, setDndDays] = React.useState({
-          Monday: false,
-          Tuesday: false,
-          Wednesday: false,
-          Thursday: false,
-          Friday: false,
-          Saturday: false,
-          Sunday: false
+        const [screenTimeLimit, setScreenTimeLimit] = React.useState(() => localStorage.getItem('screenTimeLimit') || 4);
+        const [dndDays, setDndDays] = React.useState(() => {
+          const saved = localStorage.getItem('dndDays');
+          return saved ? JSON.parse(saved) : {
+            Monday: false,
+            Tuesday: false,
+            Wednesday: false,
+            Thursday: false,
+            Friday: false,
+            Saturday: false,
+            Sunday: false
+          };
         });
-        const [dndStartTime, setDndStartTime] = React.useState('20:00');
-        const [dndEndTime, setDndEndTime] = React.useState('06:00');
+        const [dndStartTime, setDndStartTime] = React.useState(() => localStorage.getItem('dndStartTime') || '20:00');
+        const [dndEndTime, setDndEndTime] = React.useState(() => localStorage.getItem('dndEndTime') || '06:00');
         const [saveMessage, setSaveMessage] = React.useState('');
+
+        // Load settings on mount
+        React.useEffect(() => {
+          const savedScreenTimeLimit = localStorage.getItem('screenTimeLimit');
+          const savedDndDays = localStorage.getItem('dndDays');
+          const savedDndStartTime = localStorage.getItem('dndStartTime');
+          const savedDndEndTime = localStorage.getItem('dndEndTime');
+          if (savedScreenTimeLimit) setScreenTimeLimit(savedScreenTimeLimit);
+          if (savedDndDays) setDndDays(JSON.parse(savedDndDays));
+          if (savedDndStartTime) setDndStartTime(savedDndStartTime);
+          if (savedDndEndTime) setDndEndTime(savedDndEndTime);
+        }, []);
 
         const handleSliderChange = (event) => {
           setScreenTimeLimit(event.target.value);
@@ -383,6 +398,13 @@
         };
 
         const handleSave = () => {
+          // Save to localStorage
+          localStorage.setItem('screenTimeLimit', screenTimeLimit);
+          localStorage.setItem('dndDays', JSON.stringify(dndDays));
+          localStorage.setItem('dndStartTime', dndStartTime);
+          localStorage.setItem('dndEndTime', dndEndTime);
+
+          // Generate detailed save message
           const selectedDays = Object.keys(dndDays).filter(day => dndDays[day]).join(', ') || 'None';
           const dndText = selectedDays !== 'None'
             ? `Do Not Disturb on ${selectedDays} from ${dndStartTime} to ${dndEndTime}`
