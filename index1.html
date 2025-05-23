@@ -189,17 +189,43 @@
       // Safe Browsing Page
       const SafeBrowsingPage = () => {
         const [saveMessage, setSaveMessage] = React.useState('');
-        const [ageFilter, setAgeFilter] = React.useState('Under 10');
-        const [blockedSites, setBlockedSites] = React.useState([]);
-        const [timeLimits, setTimeLimits] = React.useState({});
+        const [ageFilter, setAgeFilter] = React.useState(() => localStorage.getItem('ageFilter') || 'Under 10');
+        const [blockedSites, setBlockedSites] = React.useState(() => {
+          const saved = localStorage.getItem('blockedSites');
+          return saved ? JSON.parse(saved) : ['roblox.com'];
+        });
+        const [timeLimits, setTimeLimits] = React.useState(() => {
+          const saved = localStorage.getItem('timeLimits');
+          return saved ? JSON.parse(saved) : { 'fortnite.com': 40 };
+        });
         const [tempTimeLimits, setTempTimeLimits] = React.useState({});
+
+        // Load settings on mount
+        React.useEffect(() => {
+          const savedAgeFilter = localStorage.getItem('ageFilter');
+          const savedBlockedSites = localStorage.getItem('blockedSites');
+          const savedTimeLimits = localStorage.getItem('timeLimits');
+          if (savedAgeFilter) setAgeFilter(savedAgeFilter);
+          if (savedBlockedSites) setBlockedSites(JSON.parse(savedBlockedSites));
+          if (savedTimeLimits) setTimeLimits(JSON.parse(savedTimeLimits));
+        }, []);
 
         const handleAgeFilterChange = (event) => {
           setAgeFilter(event.target.value);
         };
 
         const handleSave = () => {
-          setSaveMessage(`Safe Browsing settings saved: Age filter set to ${ageFilter}`);
+          // Save to localStorage
+          localStorage.setItem('ageFilter', ageFilter);
+          localStorage.setItem('blockedSites', JSON.stringify(blockedSites));
+          localStorage.setItem('timeLimits', JSON.stringify(timeLimits));
+
+          // Generate detailed save message
+          const blockedText = blockedSites.length > 0 ? `Blocked: ${blockedSites.join(', ')}` : 'No sites blocked';
+          const limitsText = Object.keys(timeLimits).length > 0
+            ? `Time Limits: ${Object.entries(timeLimits).map(([site, min]) => `${site} (${min} min/day)`).join(', ')}`
+            : 'No time limits set';
+          setSaveMessage(`Settings saved: Age filter set to ${ageFilter}. ${blockedText}. ${limitsText}.`);
           triggerToast();
         };
 
@@ -221,7 +247,7 @@
         const handleSetTimeLimit = (website) => {
           const limit = tempTimeLimits[website];
           if (limit && limit > 0) {
-            setTimeLimits({ ...timeLimits, [website]: limit });
+            setTimeLimits({ ...timeLimits, [website]: parseInt(limit) });
             setSaveMessage(`Time limit for ${website} set to ${limit} minutes/day.`);
             triggerToast();
           } else {
@@ -290,7 +316,7 @@
                               min="0"
                               placeholder="Min"
                               className={`w-20 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${isBlocked ? 'bg-gray-200 cursor-not-allowed' : ''}`}
-                              value={tempTimeLimits[entry.website] || ''}
+                              value={tempTimeLimits[entry.website] || timeLimits[entry.website] || ''}
                               onChange={(e) => handleTimeLimitChange(entry.website, e.target.value)}
                               disabled={isBlocked}
                             />
