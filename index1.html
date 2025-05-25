@@ -420,6 +420,11 @@
         });
         const [newWord, setNewWord] = React.useState('');
         const [notifyOnFilteredMessage, setNotifyOnFilteredMessage] = React.useState(() => localStorage.getItem('notifyOnFilteredMessage') === 'true');
+        const [discussedMessages, setDiscussedMessages] = React.useState(() => {
+          const saved = localStorage.getItem('discussedMessages');
+          console.log('Initial discussedMessages from localStorage:', saved);
+          return saved ? JSON.parse(saved) : {};
+        });
 
         React.useEffect(() => {
           const savedAgeFilter = localStorage.getItem('ageFilter');
@@ -427,12 +432,15 @@
           const savedTimeLimits = localStorage.getItem('timeLimits');
           const savedFilteredWords = localStorage.getItem('filteredWords');
           const savedNotifyOnFilteredMessage = localStorage.getItem('notifyOnFilteredMessage');
+          const savedDiscussedMessages = localStorage.getItem('discussedMessages');
           if (savedAgeFilter) setAgeFilter(savedAgeFilter);
           if (savedBlockedSites) setBlockedSites(JSON.parse(savedBlockedSites));
           if (savedTimeLimits) setTimeLimits(JSON.parse(savedTimeLimits));
           if (savedFilteredWords) setFilteredWords(JSON.parse(savedFilteredWords));
           if (savedNotifyOnFilteredMessage) setNotifyOnFilteredMessage(savedNotifyOnFilteredMessage === 'true');
+          if (savedDiscussedMessages) setDiscussedMessages(JSON.parse(savedDiscussedMessages));
           console.log('Loaded filteredWords:', filteredWords);
+          console.log('Loaded discussedMessages:', discussedMessages);
         }, []);
 
         const handleAgeFilterChange = (event) => {
@@ -445,13 +453,18 @@
           localStorage.setItem('timeLimits', JSON.stringify(timeLimits));
           localStorage.setItem('filteredWords', JSON.stringify(filteredWords));
           localStorage.setItem('notifyOnFilteredMessage', notifyOnFilteredMessage);
+          localStorage.setItem('discussedMessages', JSON.stringify(discussedMessages));
           console.log('Saving filteredWords:', filteredWords);
+          console.log('Saving discussedMessages:', discussedMessages);
           const blockedText = blockedSites.length > 0 ? `Blocked sites: ${blockedSites.join(', ')}` : 'No sites blocked';
           const limitsText = Object.keys(timeLimits).length > 0
             ? `Time limits: ${Object.entries(timeLimits).map(([site, min]) => `${site} (${min} min/day)`).join(', ')}`
             : 'No time limits set';
           const wordsText = filteredWords.length > 0 ? `Filtered words: ${filteredWords.join(', ')}` : 'No filtered words';
-          setSaveMessage(`Settings saved: Age filter set to ${ageFilter}. ${blockedText}. ${limitsText}. ${wordsText}. Message notifications ${notifyOnFilteredMessage ? 'enabled' : 'disabled'} to +16479669317`);
+          const discussedText = Object.values(discussedMessages).includes(true)
+            ? `Discussed messages: ${Object.entries(discussedMessages).filter(([_, discussed]) => discussed).map(([id]) => `Message ${id}`).join(', ')}`
+            : 'No messages marked as discussed';
+          setSaveMessage(`Settings saved: Age filter set to ${ageFilter}. ${blockedText}. ${limitsText}. ${wordsText}. ${discussedText}. Message notifications ${notifyOnFilteredMessage ? 'enabled' : 'disabled'} to +16479669317`);
           triggerToast('Settings saved');
         };
 
@@ -520,18 +533,29 @@
           setNotifyOnFilteredMessage(!notifyOnFilteredMessage);
         };
 
+        const handleDiscussToggle = (messageId) => {
+          setDiscussedMessages((prev) => {
+            const newDiscussed = { ...prev, [messageId]: !prev[messageId] };
+            console.log('Toggled discussed for message', messageId, 'new discussedMessages:', newDiscussed);
+            localStorage.setItem('discussedMessages', JSON.stringify(newDiscussed));
+            setSaveMessage(`Message ${messageId} marked as ${newDiscussed[messageId] ? 'discussed' : 'not discussed'} and saved.`);
+            triggerToast(`Message ${messageId} marked as ${newDiscussed[messageId] ? 'discussed' : 'not discussed'}`);
+            return newDiscussed;
+          });
+        };
+
+        const messageHistory = [
+          { id: 1, content: 'You are being blackmailed!', time: '11:30 AM, May 23, 2025', app: 'WhatsApp', flaggedWord: 'blackmail' },
+          { id: 2, content: 'Send nude pics or else!', time: '10:00 AM, May 23, 2025', app: 'Snapchat', flaggedWord: 'nude' },
+          { id: 3, content: 'I’m threatening you if you don’t comply.', time: '9:15 AM, May 23, 2025', app: 'Messages', flaggedWord: 'threatening' },
+        ];
+
         const browsingHistory = [
           { website: 'example.com', time: '10:15 AM, May 22, 2025', duration: '5 min' },
           { website: 'instagram.com', time: '9:45 AM, May 22, 2025', duration: '30 min' },
           { website: 'roblox.com', time: '9:00 AM, May 22, 2025', duration: '45 min' },
           { website: 'fortnite.com', time: '8:30 AM, May 22, 2025', duration: '20 min' },
           { website: 'youtube.com', time: '8:00 AM, May 22, 2025', duration: '60 min' },
-        ];
-
-        const messageHistory = [
-          { id: 1, content: 'You are being blackmailed!', time: '11:30 AM, May 23, 2025', app: 'WhatsApp', flaggedWord: 'blackmail' },
-          { id: 2, content: 'Send nude pics or else!', time: '10:00 AM, May 23, 2025', app: 'Snapchat', flaggedWord: 'nude' },
-          { id: 3, content: 'I’m threatening you if you don’t comply.', time: '9:15 AM, May 23, 2025', app: 'Messages', flaggedWord: 'threatening' },
         ];
 
         return (
@@ -599,7 +623,8 @@
                       <th className="p-3 rounded-tl-lg">Message Content</th>
                       <th className="p-3">Time</th>
                       <th className="p-3">App</th>
-                      <th className="p-3 rounded-tr-lg">Flagged Word</th>
+                      <th className="p-3">Flagged Word</th>
+                      <th className="p-3 rounded-tr-lg">Parent Discussed</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -609,6 +634,14 @@
                         <td className="p-3 text-gray-600">{msg.time}</td>
                         <td className="p-3 text-gray-600">{msg.app}</td>
                         <td className="p-3 text-red-600">{msg.flaggedWord}</td>
+                        <td className="p-3 text-center">
+                          <input
+                            type="checkbox"
+                            className="accent-blue-500"
+                            checked={discussedMessages[msg.id] || false}
+                            onChange={() => handleDiscussToggle(msg.id)}
+                          />
+                        </td>
                       </tr>
                     ))}
                   </tbody>
