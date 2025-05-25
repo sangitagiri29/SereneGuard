@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jio SafeNet - Parental Portal</title>
+  <title>SereneGuard - Parental Portal</title>
   <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/babel-standalone@6.26.0/babel.min.js"></script>
@@ -33,6 +33,15 @@
     }
     .sidebar {
       transition: transform 0.3s ease-in-out;
+    }
+    .logo-img {
+      height: 40px;
+      width: auto;
+    }
+    @media (max-width: 640px) {
+      .logo-img {
+        height: 32px;
+      }
     }
   </style>
 </head>
@@ -338,7 +347,7 @@
         <div className="p-6 max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold mb-6 text-gray-800 animate-fadeIn flex items-center">
             <i className="fas fa-shield-alt text-blue-600 mr-2"></i>
-            Welcome to Jio SafeNet
+            Welcome to SereneGuard
             <span className="ml-2 text-sm bg-blue-600 text-white px-2 py-1 rounded-full">New</span>
           </h2>
           <div className="bg-white p-6 rounded-xl shadow-lg mb-6 animate-fadeIn">
@@ -894,9 +903,8 @@
       return (
         <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col">
           <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 flex justify-between items-center shadow-md sticky top-0 z-40">
-            <h1 className="text-2xl font-bold flex items-center">
-              <i className="fas fa-shield-alt mr-2"></i>
-              Jio SafeNet
+            <h1 className="flex items-center">
+              <img src="/SGlogo.png" alt="Logo" className="logo-img" />
             </h1>
             <div className="flex items-center space-x-4">
               <span className="text-sm font-medium">Parent Account</span>
@@ -961,7 +969,7 @@
                   <i className="fas fa-exclamation-circle mr-2"></i>
                   SOS Alert
                 </h3>
-                <p className="text-gray-700">Text sent to +16479669317: SOS: Emergency alert from Jio SafeNet at 04:08 PM, May 18, 2025</p>
+                <p className="text-gray-700">Text sent to +16479669317: SOS: Emergency alert from SereneGuard at 04:08 PM, May 18, 2025</p>
                 <p className="text-gray-600 text-sm mt-2">Contact notified: Emergency Contact (+16479669317)</p>
                 <button
                   className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-lg w-full mt-4 hover:from-blue-600 hover:to-blue-700 transition"
