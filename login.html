@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jio SafeNet - Parent Face Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- FaceIO SDK -->
+  <script src="https://cdn.faceio.net/fio.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-100 to-purple-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-xl shadow-lg max-w-md w-full animate-fadeIn">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+      <i class="fas fa-shield-alt text-blue-600 mr-2"></i>
+      Jio SafeNet - Parent Login
+    </h1>
+    <p class="text-gray-600 mb-4">Use facial recognition to access the parental portal.</p>
+    <div class="flex flex-col space-y-4">
+      <button
+        id="enrollButton"
+        class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
+        onclick="enrollUser()"
+      >
+        Register Face
+      </button>
+      <button
+        id="authButton"
+        class="bg-gradient-to-r from-green-500 to-green-600 text-white p-3 rounded-lg hover:from-green-600 hover:to-green-700 transition"
+        onclick="authenticateUser()"
+      >
+        Login with Face Scan
+      </button>
+    </div>
+    <p id="errorMessage" class="text-red-600 mt-4 hidden"></p>
+    <p id="successMessage" class="text-green-600 mt-4 hidden"></p>
+  </div>
+
+  <script>
+    let faceio;
+    window.onload = async () => {
+      try {
+        faceio = new faceIO("fioa9b3e"); // Replace with your FaceIO App Public ID
+        document.getElementById("successMessage").textContent = "FaceIO initialized successfully.";
+        document.getElementById("successMessage").classList.remove("hidden");
+      } catch (error) {
+        showError("Failed to initialize FaceIO: " + error.message);
+      }
+    };
+
+    async function enrollUser() {
+      try {
+        const response = await faceio.enroll({
+          locale: "auto",
+          payload: { email: "parent@example.com", userId: "parent1" }
+        });
+        showSuccess("Face registered successfully! Please login.");
+        console.log("Enrolled user:", response);
+      } catch (error) {
+        showError("Enrollment failed: " + error.message);
+        console.error("Enrollment error:", error);
+      }
+    }
+
+    async function authenticateUser() {
+      try {
+        const response = await faceio.authenticate({
+          locale: "auto"
+        });
+        showSuccess("Authentication successful! Redirecting...");
+        console.log("Authenticated user:", response);
+        sessionStorage.setItem("isAuthenticated", "true");
+        setTimeout(() => {
+          window.location.href = "index1.html";
+        }, 1000);
+      } catch (error) {
+        showError("Authentication failed: " + error.message);
+        console.error("Authentication error:", error);
+      }
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById("errorMessage");
+      errorDiv.textContent = message;
+      errorDiv.classList.remove("hidden");
+      document.getElementById("successMessage").classList.add("hidden");
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.getElementById("successMessage");
+      successDiv.textContent = message;
+      successDiv.classList.remove("hidden");
+      document.getElementById("errorMessage").classList.add("hidden");
+    }
+  </script>
+</body>
+</html>
