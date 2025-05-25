@@ -67,15 +67,14 @@
         });
         const [childLocation, setChildLocation] = React.useState(() => {
           const saved = localStorage.getItem('childLocation');
-          return saved ? JSON.parse(saved) : [26.8489, 80.9470]; // Start at Gomti Nagar
+          return saved ? JSON.parse(saved) : [26.8489, 80.9470];
         });
         const [notifyOnExit, setNotifyOnExit] = React.useState(() => localStorage.getItem('notifyOnExit') === 'true');
         const mapRef = React.useRef(null);
         const childMarkerRef = React.useRef(null);
 
-        // Haversine formula to calculate distance (in meters)
         const getDistance = (lat1, lng1, lat2, lng2) => {
-          const R = 6371e3; // Earth's radius in meters
+          const R = 6371e3;
           const φ1 = lat1 * Math.PI / 180;
           const φ2 = lat2 * Math.PI / 180;
           const Δφ = (lat2 - lat1) * Math.PI / 180;
@@ -87,7 +86,6 @@
           return R * c;
         };
 
-        // Check if child is in a safe zone
         const checkSafeZones = (location) => {
           for (const zone of safeZones) {
             const distance = getDistance(location[0], location[1], zone.lat, zone.lng);
@@ -98,7 +96,6 @@
           return { inZone: false, zoneName: '' };
         };
 
-        // Initialize map and markers
         React.useEffect(() => {
           const map = L.map('map').setView(childLocation, 14);
           mapRef.current = map;
@@ -130,7 +127,6 @@
           return () => map.remove();
         }, []);
 
-        // Update child marker and check geofencing
         React.useEffect(() => {
           if (childMarkerRef.current) {
             childMarkerRef.current.setLatLng(childLocation);
@@ -174,7 +170,6 @@
         };
 
         const handleLocateChild = () => {
-          // Simulate refreshing child location (in real app, this would fetch GPS)
           const { inZone, zoneName } = checkSafeZones(childLocation);
           setAlertMessage(`Child located at [${childLocation[0].toFixed(4)}, ${childLocation[1].toFixed(4)}], ${inZone ? `In ${zoneName} Safe Zone` : 'Outside safe zone'}`);
           triggerToast('Child location updated');
@@ -189,7 +184,6 @@
         };
 
         const handleSendDirections = () => {
-          // Send directions to the nearest safe zone or home ([26.8495, 80.9465])
           const home = [26.8495, 80.9465];
           let target = home;
           let targetName = 'Home';
@@ -207,9 +201,8 @@
           triggerToast(`Directions sent to ${targetName}`);
         };
 
-        // Test movement
         const moveChild = (direction) => {
-          const step = 0.005; // ~500m
+          const step = 0.005;
           let newLocation = [...childLocation];
           switch (direction) {
             case 'north': newLocation[0] += step; break;
@@ -499,15 +492,17 @@
             return;
           }
           setFilteredWords([...filteredWords, trimmedWord]);
-          setSaveMessage(`Filtered word "${trimmedWord}" added.`);
+          setSaveMessage(`Filtered word "${trimmedWord}" added and saved.`);
           triggerToast(`Added filtered word: ${trimmedWord}`);
           setNewWord('');
+          handleSave(); // Automatically save to persist changes
         };
 
         const handleRemoveFilteredWord = (word) => {
           setFilteredWords(filteredWords.filter(w => w !== word));
-          setSaveMessage(`Filtered word "${word}" removed.`);
+          setSaveMessage(`Filtered word "${word}" removed and saved.`);
           triggerToast(`Removed filtered word: ${word}`);
+          handleSave(); // Automatically save to persist changes
         };
 
         const handleNotifyOnFilteredMessageChange = () => {
