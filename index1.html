@@ -415,6 +415,7 @@
         const [tempTimeLimits, setTempTimeLimits] = React.useState({});
         const [filteredWords, setFilteredWords] = React.useState(() => {
           const saved = localStorage.getItem('filteredWords');
+          console.log('Initial filteredWords from localStorage:', saved);
           return saved ? JSON.parse(saved) : ['nude', 'blackmail', 'threatening'];
         });
         const [newWord, setNewWord] = React.useState('');
@@ -431,6 +432,7 @@
           if (savedTimeLimits) setTimeLimits(JSON.parse(savedTimeLimits));
           if (savedFilteredWords) setFilteredWords(JSON.parse(savedFilteredWords));
           if (savedNotifyOnFilteredMessage) setNotifyOnFilteredMessage(savedNotifyOnFilteredMessage === 'true');
+          console.log('Loaded filteredWords:', filteredWords);
         }, []);
 
         const handleAgeFilterChange = (event) => {
@@ -443,6 +445,7 @@
           localStorage.setItem('timeLimits', JSON.stringify(timeLimits));
           localStorage.setItem('filteredWords', JSON.stringify(filteredWords));
           localStorage.setItem('notifyOnFilteredMessage', notifyOnFilteredMessage);
+          console.log('Saving filteredWords:', filteredWords);
           const blockedText = blockedSites.length > 0 ? `Blocked sites: ${blockedSites.join(', ')}` : 'No sites blocked';
           const limitsText = Object.keys(timeLimits).length > 0
             ? `Time limits: ${Object.entries(timeLimits).map(([site, min]) => `${site} (${min} min/day)`).join(', ')}`
@@ -491,18 +494,26 @@
             triggerToast(`"${trimmedWord}" already filtered`);
             return;
           }
-          setFilteredWords([...filteredWords, trimmedWord]);
-          setSaveMessage(`Filtered word "${trimmedWord}" added and saved.`);
-          triggerToast(`Added filtered word: ${trimmedWord}`);
+          setFilteredWords((prev) => {
+            const newWords = [...prev, trimmedWord];
+            console.log('Added word, new filteredWords:', newWords);
+            localStorage.setItem('filteredWords', JSON.stringify(newWords));
+            setSaveMessage(`Filtered word "${trimmedWord}" added and saved.`);
+            triggerToast(`Added filtered word: ${trimmedWord}`);
+            return newWords;
+          });
           setNewWord('');
-          handleSave(); // Automatically save to persist changes
         };
 
         const handleRemoveFilteredWord = (word) => {
-          setFilteredWords(filteredWords.filter(w => w !== word));
-          setSaveMessage(`Filtered word "${word}" removed and saved.`);
-          triggerToast(`Removed filtered word: ${word}`);
-          handleSave(); // Automatically save to persist changes
+          setFilteredWords((prev) => {
+            const newWords = prev.filter(w => w !== word);
+            console.log('Removed word, new filteredWords:', newWords);
+            localStorage.setItem('filteredWords', JSON.stringify(newWords));
+            setSaveMessage(`Filtered word "${word}" removed and saved.`);
+            triggerToast(`Removed filtered word: ${word}`);
+            return newWords;
+          });
         };
 
         const handleNotifyOnFilteredMessageChange = () => {
