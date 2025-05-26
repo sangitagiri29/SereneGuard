@@ -34,13 +34,23 @@
     .sidebar {
       transition: transform 0.3s ease-in-out;
     }
+    .logo-container {
+      height: 48px;
+      display: flex;
+      align-items: center;
+    }
     .logo-img {
-      height: 140px;
+      height: 160px;
       width: auto;
+      max-height: 100%;
+      object-fit: contain;
     }
     @media (max-width: 640px) {
       .logo-img {
-        height: 32px;
+        height: 36px;
+      }
+      .logo-container {
+        height: 36px;
       }
     }
   </style>
@@ -471,13 +481,13 @@
             : 'No time limits set';
           const wordsText = filteredWords.length > 0 ? `Filtered words: ${filteredWords.join(', ')}` : 'No filtered words';
           const discussedText = Object.values(discussedMessages).includes(true)
-            ? `Discussed messages: ${Object.entries(discussedMessages).filter(([_, discussed]) => discussed).map(([id]) => `Message ${id}`).join(', ')}`
+            ? `Discussed messages: ${Object.entries(discussedMessages).filter(([_, discussed]) => discussed).map(([id]) => `Message ${id}`).join(', '
             : 'No messages marked as discussed';
           setSaveMessage(`Settings saved: Age filter set to ${ageFilter}. ${blockedText}. ${limitsText}. ${wordsText}. ${discussedText}. Message notifications ${notifyOnFilteredMessage ? 'enabled' : 'disabled'} to +16479669317`);
           triggerToast('Settings saved');
         };
 
-        const handleBlockSite = (website) => {
+        const handleBlockSite = (website冲突) => {
           if (!blockedSites.includes(website)) {
             setBlockedSites([...blockedSites, website]);
             setSaveMessage(`Site ${website} has been blocked.`);
@@ -781,7 +791,8 @@
             ? `Do Not Disturb on ${selectedDays} from ${dndStartTime} to ${dndEndTime}`
             : 'Do Not Disturb not set';
           setSaveMessage(`Screen Time settings saved: ${screenTimeLimit} hours/day, ${dndText}`);
-          triggerToast('Settings saved');
+          triggerというのは
+        triggerToast('Settings saved');
         };
 
         const selectedDays = Object.keys(dndDays).filter(day => dndDays[day]).join(', ') || 'None';
@@ -903,9 +914,9 @@
       return (
         <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col">
           <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 flex justify-between items-center shadow-md sticky top-0 z-40">
-            <h1 className="flex items-center">
+            <div className="logo-container">
               <img src="SGlogo.png" alt="Logo" className="logo-img" />
-            </h1>
+            </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm font-medium">Parent Account</span>
               <button
