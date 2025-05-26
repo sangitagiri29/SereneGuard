@@ -6,7 +6,7 @@
   <title>SereneGuard - Parental Portal</title>
   <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/babel-standalone@6.26.0/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.22.5/Babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Leaflet CSS and JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -53,11 +53,41 @@
         height: 36px;
       }
     }
+    .error-boundary {
+      padding: 20px;
+      background-color: #fee2e2;
+      border: 1px solid #ef4444;
+      border-radius: 8px;
+      margin: 20px;
+      color: #b91c1c;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-100 to-purple-100">
   <div id="root"></div>
   <script type="text/babel">
+    // Error Boundary Component
+    class ErrorBoundary extends React.Component {
+      state = { hasError: false, error: null };
+
+      static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+      }
+
+      render() {
+        if (this.state.hasError) {
+          return (
+            <div className="error-boundary">
+              <h2>Something went wrong.</h2>
+              <p>{this.state.error?.message || 'Unknown error'}</p>
+              <button onClick={() => window.location.reload()}>Reload Page</button>
+            </div>
+          );
+        }
+        return this.props.children;
+      }
+    }
+
     function App() {
       const [currentPage, setCurrentPage] = React.useState('dashboard');
       const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
@@ -481,13 +511,13 @@
             : 'No time limits set';
           const wordsText = filteredWords.length > 0 ? `Filtered words: ${filteredWords.join(', ')}` : 'No filtered words';
           const discussedText = Object.values(discussedMessages).includes(true)
-            ? `Discussed messages: ${Object.entries(discussedMessages).filter(([_, discussed]) => discussed).map(([id]) => `Message ${id}`).join(', '
+            ? `Discussed messages: ${Object.entries(discussedMessages).filter(([_, discussed]) => discussed).map(([id]) => `Message ${id}`).join(', ')}`
             : 'No messages marked as discussed';
           setSaveMessage(`Settings saved: Age filter set to ${ageFilter}. ${blockedText}. ${limitsText}. ${wordsText}. ${discussedText}. Message notifications ${notifyOnFilteredMessage ? 'enabled' : 'disabled'} to +16479669317`);
           triggerToast('Settings saved');
         };
 
-        const handleBlockSite = (website冲突) => {
+        const handleBlockSite = (website) => {
           if (!blockedSites.includes(website)) {
             setBlockedSites([...blockedSites, website]);
             setSaveMessage(`Site ${website} has been blocked.`);
@@ -791,8 +821,7 @@
             ? `Do Not Disturb on ${selectedDays} from ${dndStartTime} to ${dndEndTime}`
             : 'Do Not Disturb not set';
           setSaveMessage(`Screen Time settings saved: ${screenTimeLimit} hours/day, ${dndText}`);
-          triggerというのは
-        triggerToast('Settings saved');
+          triggerToast('Settings saved');
         };
 
         const selectedDays = Object.keys(dndDays).filter(day => dndDays[day]).join(', ') || 'None';
@@ -912,95 +941,98 @@
       );
 
       return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col">
-          <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 flex justify-between items-center shadow-md sticky top-0 z-40">
-            <div className="logo-container">
-              <img src="SGlogo.png" alt="Logo" className="logo-img" />
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium">Parent Account</span>
-              <button
-                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full font-semibold hover:from-red-600 hover:to-red-700 transition"
-                onClick={triggerSos}
-              >
-                SOS
-              </button>
-              <button className="text-2xl hover:text-gray-200 transition" onClick={toggleSidebar}>
-                <i className="fas fa-bars"></i>
-              </button>
-            </div>
-          </header>
-          <div className="flex flex-1">
-            <div className={`sidebar fixed inset-y-0 left-0 w-64 bg-white shadow-xl z-50 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:min-h-screen md:shadow-none md:bg-gradient-to-b from-blue-50 to-white transition-transform duration-300`}>
-              <div className="p-4 flex flex-col h-full">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-800 flex items-center">
-                    <i className="fas fa-list mr-2 text-blue-600"></i>
-                    Menu
-                  </h2>
-                  <button className="md:hidden text-gray-600 hover:text-gray-800" onClick={toggleSidebar}>
-                    <i className="fas fa-times"></i>
-                  </button>
-                </div>
-                <nav className="space-y-2 flex-1">
-                  <button className="w-full text-left p-3 hover:bg-blue-100 rounded flex items-center text-gray-700 hover:text-blue-600 transition" onClick={() => { setCurrentPage('geofencing'); setIsSidebarOpen(false); }}>
-                    <i className="fas fa-map-marker-alt mr-2"></i>
-                    Geofencing
-                  </button>
-                  <button className="w-full text-left p-3 hover:bg-blue-100 rounded flex items-center text-gray-700 hover:text-blue-600 transition" onClick={() => { setCurrentPage('browsing'); setIsSidebarOpen(false); }}>
-                    <i className="fas fa-globe mr-2"></i>
-                    Safe Browsing
-                  </button>
-                  <button className="w-full text-left p-3 hover:bg-blue-100 rounded flex items-center text-gray-700 hover:text-blue-600 transition" onClick={() => { setCurrentPage('screenTime'); setIsSidebarOpen(false); }}>
-                    <i className="fas fa-clock mr-2"></i>
-                    Screen Time
-                  </button>
-                  <button className="w-full text-left p-3 hover:bg-blue-100 rounded flex items-center text-gray-700 hover:text-blue-600 transition" onClick={() => { setCurrentPage('notifications'); setIsSidebarOpen(false); }}>
-                    <i className="fas fa-bell mr-2"></i>
-                    Notifications
-                  </button>
-                </nav>
+        <ErrorBoundary>
+          <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col">
+            <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 flex justify-between items-center shadow-md sticky top-0 z-40">
+              <div className="logo-container">
+                <img src="https://via.placeholder.com/160x48.png" alt="Logo" className="logo-img" />
               </div>
-            </div>
-            {isSidebarOpen && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={toggleSidebar}></div>
-            )}
-            <main className="flex-1 w-full">
-              {currentPage === 'dashboard' && <Dashboard />}
-              {currentPage === 'geofencing' && <GeofencingPage />}
-              {currentPage === 'browsing' && <SafeBrowsingPage />}
-              {currentPage === 'screenTime' && <ScreenTimePage />}
-              {currentPage === 'notifications' && <NotificationsPage />}
-            </main>
-          </div>
-          {showSosModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full animate-fadeIn">
-                <h3 className="text-xl font-bold text-red-600 mb-2 flex items-center">
-                  <i className="fas fa-exclamation-circle mr-2"></i>
-                  SOS Alert
-                </h3>
-                <p className="text-gray-700">Text sent to +16479669317: SOS: Emergency alert from SereneGuard at 04:08 PM, May 18, 2025</p>
-                <p className="text-gray-600 text-sm mt-2">Contact notified: Emergency Contact (+16479669317)</p>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Parent Account</span>
                 <button
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-lg w-full mt-4 hover:from-blue-600 hover:to-blue-700 transition"
-                  onClick={closeSosModal}
+                  className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full font-semibold hover:from-red-600 hover:to-red-700 transition"
+                  onClick={triggerSos}
                 >
-                  Close
+                  SOS
+                </button>
+                <button className="text-2xl hover:text-gray-200 transition" onClick={toggleSidebar}>
+                  <i className="fas fa-bars"></i>
                 </button>
               </div>
+            </header>
+            <div className="flex flex-1">
+              <div className={`sidebar fixed inset-y-0 left-0 w-64 bg-white shadow-xl z-50 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:min-h-screen md:shadow-none md:bg-gradient-to-b from-blue-50 to-white transition-transform duration-300`}>
+                <div className="p-4 flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                      <i className="fas fa-list mr-2 text-blue-600"></i>
+                      Menu
+                    </h2>
+                    <button className="md:hidden text-gray-600 hover:text-gray-800" onClick={toggleSidebar}>
+                      <i className="fas fa-times"></i>
+                    </button>
+                  </div>
+                  <nav className="space-y-2 flex-1">
+                    <button className="w-full text-left p-3 hover:bg-blue-100 rounded flex items-center text-gray-700 hover:text-blue-600 transition" onClick={() => { setCurrentPage('geofencing'); setIsSidebarOpen(false); }}>
+                      <i className="fas fa-map-marker-alt mr-2"></i>
+                      Geofencing
+                    </button>
+                    <button className="w-full text-left p-3 hover:bg-blue-100 rounded flex items-center text-gray-700 hover:text-blue-600 transition" onClick={() => { setCurrentPage('browsing'); setIsSidebarOpen(false); }}>
+                      <i className="fas fa-globe mr-2"></i>
+                      Safe Browsing
+                    </button>
+                    <button className="w-full text-left p-3 hover:bg-blue-100 rounded flex items-center text-gray-700 hover:text-blue-600 transition" onClick={() => { setCurrentPage('screenTime'); setIsSidebarOpen(false); }}>
+                      <i className="fas fa-clock mr-2"></i>
+                      Screen Time
+                    </button>
+                    <button className="w-full text-left p-3 hover:bg-blue-100 rounded flex items-center text-gray-700 hover:text-blue-600 transition" onClick={() => { setCurrentPage('notifications'); setIsSidebarOpen(false); }}>
+                      <i className="fas fa-bell mr-2"></i>
+                      Notifications
+                    </button>
+                  </nav>
+                </div>
+              </div>
+              {isSidebarOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={toggleSidebar}></div>
+              )}
+              <main className="flex-1 w-full">
+                {currentPage === 'dashboard' && <Dashboard />}
+                {currentPage === 'geofencing' && <GeofencingPage />}
+                {currentPage === 'browsing' && <SafeBrowsingPage />}
+                {currentPage === 'screenTime' && <ScreenTimePage />}
+                {currentPage === 'notifications' && <NotificationsPage />}
+              </main>
             </div>
-          )}
-          {showToast && (
-            <div className="fixed bottom-4 right-4 bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg shadow-lg z-50 animate-fadeIn">
-              <p>{showToast}</p>
-            </div>
-          )}
-        </div>
+            {showSosModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full animate-fadeIn">
+                  <h3 className="text-xl font-bold text-red-600 mb-2 flex items-center">
+                    <i className="fas fa-exclamation-circle mr-2"></i>
+                    SOS Alert
+                  </h3>
+                  <p className="text-gray-700">Text sent to +16479669317: SOS: Emergency alert from SereneGuard at 04:08 PM, May 18, 2025</p>
+                  <p className="text-gray-600 text-sm mt-2">Contact notified: Emergency Contact (+16479669317)</p>
+                  <button
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-lg w-full mt-4 hover:from-blue-600 hover:to-blue-700 transition"
+                    onClick={closeSosModal}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+            {showToast && (
+              <div className="fixed bottom-4 right-4 bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg shadow-lg z-50 animate-fadeIn">
+                <p>{showToast}</p>
+              </div>
+            )}
+          </div>
+        </ErrorBoundary>
       );
     }
 
-    ReactDOM.render(<App />, document.getElementById('root'));
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
   </script>
 </body>
 </html>
