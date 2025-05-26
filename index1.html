@@ -34,10 +34,17 @@
     .sidebar {
       transition: transform 0.3s ease-in-out;
     }
-    .logo-img {
-      height: 40px;
-      width: auto;
-    }
+    .header {
+            background-color: #1e90ff;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+    .logo {
+            width: 200px; /* Increased size */
+            height: auto;
+            filter: drop-shadow(2px 2px 5px rgba(0, 0, 0, 0.5)); /* Added shadow for depth */
+        }
     @media (max-width: 640px) {
       .logo-img {
         height: 32px;
@@ -903,7 +910,7 @@
       return (
         <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex flex-col">
           <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 flex justify-between items-center shadow-md sticky top-0 z-40">
-            <h1 className="flex items-center">
+            <h1 className="header">
               <img src="SGlogo.png" alt="Logo" className="logo-img" />
             </h1>
             <div className="flex items-center space-x-4">
