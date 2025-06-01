@@ -1,0 +1,125 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SereneGuard Impact vs. Effort Quadrant Map</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+</head>
+<body>
+  <canvas id="quadrantChart" width="600" height="600"></canvas>
+  <script>
+    const ctx = document.getElementById('quadrantChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Features',
+          data: [
+            { x: 3, y: 5, label: 'Content Filtering' },
+            { x: 4, y: 3, label: 'Customizable User Profiles' },
+            { x: 3, y: 3, label: 'Activity Monitoring' },
+            { x: 4, y: 4, label: 'Real-Time Alerts' },
+            { x: 5, y: 5, label: 'Telco Network Integration' },
+            { x: 3, y: 4, label: 'User-Friendly Dashboard' },
+            { x: 5, y: 3, label: 'Mobile App Support' },
+            { x: 4, y: 5, label: 'Geofencing' },
+            { x: 3, y: 4, label: 'Facial Recognition' }
+          ],
+          backgroundColor: [
+            '#4CAF50', '#2196F3', '#FF9800', '#F44336', '#9C27B0',
+            '#4CAF50', '#2196F3', '#FF9800', '#F44336'
+          ],
+          borderColor: '#ffffff',
+          borderWidth: 1,
+          pointRadius: 6
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            title: { display: true, text: 'Effort (1-5)' },
+            min: 1,
+            max: 5,
+            grid: {
+              drawTicks: false,
+              lineWidth: [0, 0, 0, 2, 0],
+              color: ['#000000', '#000000', '#000000', '#666666', '#000000']
+            },
+            ticks: { stepSize: 1 }
+          },
+          y: {
+            title: { display: true, text: 'Impact (1-5)' },
+            min: 1,
+            max: 5,
+            grid: {
+              drawTicks: false,
+              lineWidth: [0, 0, 0, 2, 0],
+              color: ['#000000', '#000000', '#000000', '#666666', '#000000']
+            },
+            ticks: { stepSize: 1 }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.raw.label;
+              }
+            }
+          },
+          annotation: {
+            annotations: {
+              quadrant1: {
+                type: 'label',
+                xValue: 2,
+                yValue: 4.5,
+                content: ['Quick Wins'],
+                font: { size: 14 },
+                color: '#4CAF50'
+              },
+              quadrant2: {
+                type: 'label',
+                xValue: 4.5,
+                yValue: 4.5,
+                content: ['Major Projects'],
+                font: { size: 14 },
+                color: '#F44336'
+              },
+              quadrant3: {
+                type: 'label',
+                xValue: 2,
+                yValue: 2.5,
+                content: ['Low Priority'],
+                font: { size: 14 },
+                color: '#999999'
+              },
+              quadrant4: {
+                type: 'label',
+                xValue: 4.5,
+                yValue: 2.5,
+                content: ['Fill-Ins'],
+                font: { size: 14 },
+                color: '#FF9800'
+              }
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+```
+
+## Instructions to View
+1. **Save the HTML**: Copy the above code into a file named `quadrant_map.html`.
+2. **Open in Browser**: Open the file in a modern browser (e.g., Chrome, Firefox). Ensure you have an internet connection, as it uses CDNs for Chart.js and the annotation plugin.
+3. **Expected Output**: A scatter plot with:
+   - Features as labeled points (e.g., “Content Filtering” at (3, 5)).
+   - X-axis (Effort: 1-5), Y-axis (Impact: 1-5).
+   - Grid lines at Effort 3.5 and Impact 3.5 to separate quadrants.
+   - Quadrant labels: Quick Wins (top-left), Major Projects (top-right), Fill-Ins (bottom-right), Low Priority (bottom-left).
+   - Distinctive colors for each point, visible on dark/light themes.
